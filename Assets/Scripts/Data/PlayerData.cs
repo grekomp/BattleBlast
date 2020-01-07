@@ -5,24 +5,27 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-[Serializable]
-public class PlayerData : SerializableWideClass
+namespace BattleBlast
 {
-	[Id] public StringReference id;
-	public StringReference username;
-
-	[SerializeField]
-	protected string password;
-
-	public List<string> friendIds;
-	public IntReference coins;
-
-	public PlayerCollection collection;
-
-	public bool IsPasswordValid(string potentialPassword)
+	[Serializable]
+	public class PlayerData : SerializableWideClass
 	{
-		return password == potentialPassword;
-	}
+		[Id] public StringReference id;
+		public StringReference username;
 
-	// TODO: Status
+		[SerializeField]
+		protected string password;
+
+		public List<string> friendIds;
+		public IntReference coins;
+
+		public PlayerCollection collection;
+
+		public bool IsPasswordValid(string potentialPassword)
+		{
+			return password == potentialPassword;
+		}
+
+		// TODO: Status
+	}
 }

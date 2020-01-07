@@ -1,26 +1,39 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Stores all game and player data
-/// </summary>
-[CreateAssetMenu(menuName = "BattleBlast/Database")]
-public class Database : ScriptableObject
+namespace BattleBlast
 {
-	[SerializeField]
-	private List<PlayerData> playerDataCollection = new List<PlayerData>();
+	/// <summary>
+	/// Stores all game and player data
+	/// </summary>
+	[CreateAssetMenu(menuName = "BattleBlast/Database")]
+	public class Database : ScriptableObject
+	{
+		[SerializeField]
+		private List<PlayerData> playerDataCollection = new List<PlayerData>();
 
-	public List<PlayerData> GetAllPlayerData()
-	{
-		return playerDataCollection;
-	}
-	public PlayerData GetPlayerDataById(string id)
-	{
-		return playerDataCollection.Find(p => p.id == id);
-	}
-	public PlayerData GetPlayerDataByName(string username)
-	{
-		return playerDataCollection.Find(p => p.username == username);
+		[SerializeField]
+		private List<UnitData> unitDataCollection = new List<UnitData>();
+
+		public List<PlayerData> GetAllPlayerData()
+		{
+			return playerDataCollection;
+		}
+		public PlayerData GetPlayerDataById(string id)
+		{
+			return playerDataCollection.Find(p => p.id == id);
+		}
+
+		public UnitData GetUnitData(string unitId)
+		{
+			return unitDataCollection.Find(u => u.id == unitId);
+		}
+
+		public PlayerData GetPlayerDataByName(string username)
+		{
+			return playerDataCollection.Find(p => p.username == username);
+		}
 	}
 }
