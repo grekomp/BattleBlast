@@ -54,5 +54,5 @@ public class ScriptableVariablesConfig : ScriptableObject
 	}
 	#endregion
 
-	public StringReference variablesSavePath = new StringReference("Assets/Variables/");
+	public StringReference variablesSavePath = new StringReference("Assets/Resources/Variables/");
 }

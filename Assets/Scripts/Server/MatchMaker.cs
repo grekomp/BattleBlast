@@ -68,6 +68,7 @@ namespace BattleBlast
 		}
 		#endregion
 
+		[Header("Match Maker Options")]
 		public MatchMakerSettings settings;
 		public List<QueuedPlayer> queue = new List<QueuedPlayer>();
 

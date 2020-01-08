@@ -3,13 +3,15 @@ using UnityEditor;
 using System.IO;
 using System;
 
-public class ScriptableVariableGenerator : EditorWindow {
+public class ScriptableVariableGenerator : EditorWindow
+{
 
 	static string variableName = "";
 	static string variablePath = "Assets";
 
-	[MenuItem("Assets/Create/ITSilesia/New ScriptableVariable type")]
-	static void Init() {
+	[MenuItem("Assets/Create/Scriptable Variables/New ScriptableVariable type")]
+	static void Init()
+	{
 		string selectedPath = AssetDatabase.GetAssetPath(Selection.activeObject);
 		if (selectedPath != "") variablePath = selectedPath;
 
@@ -18,22 +20,26 @@ public class ScriptableVariableGenerator : EditorWindow {
 		window.Show();
 	}
 
-	void OnGUI() {
+	void OnGUI()
+	{
 		variableName = EditorGUILayout.TextField("Variable Type", variableName);
 		variablePath = EditorGUILayout.TextField("Variable Path", variablePath);
 
-		if (GUILayout.Button("Create")) {
+		if (GUILayout.Button("Create"))
+		{
 			Create();
 			Close();
 		}
 
 		GUILayout.Space(10);
-		if (GUILayout.Button("Close")) {
+		if (GUILayout.Button("Close"))
+		{
 			Close();
 		}
 	}
 
-	static void Create() {
+	static void Create()
+	{
 		if (File.Exists(variablePath)) variablePath = Path.GetDirectoryName(variablePath);
 
 		AssetDatabase.StartAssetEditing();
@@ -44,11 +50,13 @@ public class ScriptableVariableGenerator : EditorWindow {
 		AssetDatabase.Refresh();
 	}
 
-	static string CreateScriptableVariableScript(string variableType, string path) {
+	static string CreateScriptableVariableScript(string variableType, string path)
+	{
 		string upperCaseType = variableType.FirstCharToUpper();
 
 		path = Path.Combine(path, upperCaseType + "Variable.cs");
-		using (StreamWriter file = new StreamWriter(path)) {
+		using (StreamWriter file = new StreamWriter(path))
+		{
 			file.WriteLine("using UnityEngine;");
 			file.WriteLine(string.Format("[CreateAssetMenu(menuName = \"Scriptable Variables/{0}\")]", upperCaseType));
 			file.WriteLine(string.Format("public class {0}Variable : ScriptableVariable<{1}> {{", upperCaseType, variableType));
@@ -62,12 +70,15 @@ public class ScriptableVariableGenerator : EditorWindow {
 
 		return path;
 	}
-	static string CreateScriptableVariableReferenceScript(string variableType, string path) {
+	static string CreateScriptableVariableReferenceScript(string variableType, string path)
+	{
 		string upperCaseType = variableType.FirstCharToUpper();
 
 		path = Path.Combine(path, upperCaseType + "Reference.cs");
-		if (File.Exists(path) == false) {
-			using (StreamWriter file = new StreamWriter(path)) {
+		if (File.Exists(path) == false)
+		{
+			using (StreamWriter file = new StreamWriter(path))
+			{
 				file.WriteLine("using System;");
 				file.WriteLine("using UnityEngine;");
 
