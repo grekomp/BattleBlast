@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   variablesSavePath:
     useConstant: 1
-    constantValue: Assets/Resources/Variables/
+    constantValue: Assets/Variables/
     variable: {fileID: 0}
     _usesTemporaryVariable: 0
     debugEnabled: 0

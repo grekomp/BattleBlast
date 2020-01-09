@@ -27,19 +27,42 @@ namespace Networking
 		#endregion
 
 		#region Managing Connection
+		protected TaskCompletionSource<ReceivedBroadcastData> broadcastEventReceivedTaskCompletionSource;
+
 		/// <summary>
 		/// Attempts to automatically connect to any available server.
 		/// </summary>
 		/// <returns></returns>
 		public async Task ConnectToServer()
 		{
+			broadcastEventReceivedTaskCompletionSource = new TaskCompletionSource<ReceivedBroadcastData>();
+			networkingCore.OnBroadcastEvent.RegisterListenerOnce(HandleBroadcastEvent);
+			networkingCore.StartScanningForBroadcast();
+
+			ReceivedBroadcastData broadcastData = await broadcastEventReceivedTaskCompletionSource.Task;
+			if (broadcastEventReceivedTaskCompletionSource.Task.Status == TaskStatus.RanToCompletion)
+			{
+
+			}
 
 
-			throw new NotImplementedException();
+			networkingCore.StopScanningForBroadcast();
+			networkingCore.OnBroadcastEvent.DeregisterListener(HandleBroadcastEvent);
 		}
 		public void DisconnectFromServer()
 		{
 			throw new NotImplementedException();
+		}
+
+		protected void HandleBroadcastEvent(GameEventData gameEventData)
+		{
+			if (gameEventData.data is ReceivedBroadcastData receivedBroadcastData)
+			{
+				if (broadcastEventReceivedTaskCompletionSource != null)
+				{
+					broadcastEventReceivedTaskCompletionSource.TrySetResult(receivedBroadcastData);
+				}
+			}
 		}
 		#endregion
 

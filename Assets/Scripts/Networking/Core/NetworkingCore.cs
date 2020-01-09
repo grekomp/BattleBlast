@@ -118,11 +118,12 @@ namespace Networking
 		}
 		private void HandleDisconnectEvent(int receivedConnectionId)
 		{
-			throw new NotImplementedException();
+			OnDisconnectEvent?.Raise(this, receivedConnectionId);
 		}
 		protected void HandleDataEvent(int receivedConnectionId, byte[] buffer)
 		{
-			throw new NotImplementedException();
+			NetworkingDataPackage receivedDataPackage = NetworkingDataPackage.DeserializeFrom(receivedConnectionId, buffer);
+			OnDataReceivedEvent?.Raise(this, new NetworkingReceivedData(receivedConnectionId, receivedDataPackage));
 		}
 		protected void HandleBroadcastEvent(int receivedHostId, int receivedConnectionId)
 		{
@@ -131,14 +132,9 @@ namespace Networking
 			NetworkTransport.GetBroadcastConnectionInfo(scanningHostId, out string senderAddress, out int senderPort, out byte broadcastError);
 			if (broadcastError == (int)NetworkError.Ok && error == (int)NetworkError.Ok)
 			{
-				DebugNet.Log("Found server.");
-				serverIp = senderAddress;
-				serverData = new ServerData(0, serverIp.Substring(7), Serializator.GetObject<string>(buffer));
-				StartConnectingToServer(senderAddress);
+				ReceivedBroadcastData receivedBroadcastData = new ReceivedBroadcastData(senderAddress, senderPort);
+				OnBroadcastEvent?.Raise(this, receivedBroadcastData);
 			}
-
-
-			throw new NotImplementedException();
 		}
 		#endregion
 

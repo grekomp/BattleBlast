@@ -2,6 +2,9 @@
 
 namespace Networking
 {
+	/// <summary>
+	/// The class that is sent over the network by NetworkingCore.
+	/// </summary>
 	[Serializable]
 	public class NetworkingDataPackage
 	{
@@ -22,7 +25,7 @@ namespace Networking
 			byte[] serializedData = Utils.ObjectSerializationExtension.SerializeToByteArray(serializableData);
 			return new NetworkingDataPackage(dataType, serializedData);
 		}
-		public static NetworkingDataPackage DeserializeFrom(byte[] serializedData)
+		public static NetworkingDataPackage DeserializeFrom(int receivedConnectionId, byte[] serializedData)
 		{
 			return Utils.ObjectSerializationExtension.Deserialize<NetworkingDataPackage>(serializedData);
 		}
