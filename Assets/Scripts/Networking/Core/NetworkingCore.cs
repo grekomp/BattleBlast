@@ -194,9 +194,14 @@ namespace Networking
 		#endregion
 
 		#region Managing connections
-		public int Connect(string serverIP)
+		public int Connect(string serverIP, int port = -1)
 		{
-			var connectionId = NetworkTransport.Connect(HostId, serverIP, Port, 0, out byte error);
+			if (port < 0)
+			{
+				port = Port;
+			}
+
+			var connectionId = NetworkTransport.Connect(HostId, serverIP, port, 0, out byte error);
 			if ((NetworkError)error == NetworkError.Ok)
 			{
 				return connectionId;
