@@ -7,15 +7,24 @@ namespace ScriptableSystems
 {
 	public class ScriptableSystem : ScriptableObject
 	{
-		[Header("Scriptable System Options")]
-		public bool initializeOnAwake = true;
+		[Serializable]
+		public class ScriptableSystemSettings
+		{
+			public bool initializeOnAwake = true;
+			[Space]
+			public bool playModeOnly = true;
+		}
+
+		[Header("Scriptable System Settings")]
+		public ScriptableSystemSettings settings;
+
 		[NonSerialized]
 		protected bool initialized = false;
 		public bool IsInitialized {
 			get { return initialized; }
 		}
 
-		public virtual void Awake() { if (initializeOnAwake) Initialize(); }
+		public virtual void Awake() { if (settings.initializeOnAwake) Initialize(); }
 		public virtual void Update() { }
 		public virtual void FixedUpdate() { }
 		public virtual void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode) { }

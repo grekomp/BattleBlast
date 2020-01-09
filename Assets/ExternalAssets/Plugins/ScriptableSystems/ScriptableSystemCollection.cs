@@ -4,14 +4,19 @@ using System.Collections.Generic;
 using System;
 using UnityEngine.SceneManagement;
 
-namespace ScriptableSystems {
+namespace ScriptableSystems
+{
 	[CreateAssetMenu(menuName = "Systems/ScriptableSystemCollection")]
-	public class ScriptableSystemCollection : ScriptableObject {
+	public class ScriptableSystemCollection : ScriptableObject
+	{
 		public List<ScriptableSystem> systems = new List<ScriptableSystem>();
 
-		public T Get<T>() where T : ScriptableSystem {
-			foreach (var system in systems) {
-				if (system is T typeSystem) {
+		public T Get<T>() where T : ScriptableSystem
+		{
+			foreach (var system in systems)
+			{
+				if (system is T typeSystem)
+				{
 					return typeSystem;
 				}
 			}
@@ -20,23 +25,32 @@ namespace ScriptableSystems {
 			return null;
 		}
 
-		public void Awake() {
-			foreach (var system in systems) {
+		public void Awake()
+		{
+			foreach (var system in systems)
+			{
+
 				system?.Awake();
 			}
 		}
-		public void Update() {
-			foreach (var system in systems) {
+		public void Update()
+		{
+			foreach (var system in systems)
+			{
 				system?.Update();
 			}
 		}
-		public void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode) {
-			foreach (var system in systems) {
+		public void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+		{
+			foreach (var system in systems)
+			{
 				system?.OnSceneLoaded(scene, loadSceneMode);
 			}
 		}
-		public void OnSceneUnloaded(Scene scene) {
-			foreach (var system in systems) {
+		public void OnSceneUnloaded(Scene scene)
+		{
+			foreach (var system in systems)
+			{
 				system?.OnSceneUnloaded(scene);
 			}
 		}

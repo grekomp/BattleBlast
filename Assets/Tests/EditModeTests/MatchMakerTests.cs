@@ -41,7 +41,7 @@ namespace Tests
 		public void SetUp()
 		{
 			Server.MatchMaker.Dispose();
-			Server.MatchMaker.settings = testMatchmakerSettings;
+			Server.MatchMaker.matchMakerSettings = testMatchmakerSettings;
 		}
 
 		[UnityTest]

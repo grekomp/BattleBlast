@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initializeOnAwake: 0
   options:
-    port: 8865
-    broadcastPort: 8866
+    port: 8893
+    broadcastPort: 8890
     broadcastKey: 8671
     broadcastVersion: 1
     broadcastSubversion: 1
@@ -59,3 +59,12 @@ MonoBehaviour:
     debugChanges: 1
   hostId: 0
   broadcastHostId: 0
+  scanningHostId: -1
+  OnConnectEvent:
+    inspectedEvent: {fileID: 0}
+  OnDisconnectEvent:
+    inspectedEvent: {fileID: 0}
+  OnDataReceivedEvent:
+    inspectedEvent: {fileID: 0}
+  OnBroadcastEvent:
+    inspectedEvent: {fileID: 0}

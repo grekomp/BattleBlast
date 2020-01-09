@@ -69,7 +69,7 @@ namespace BattleBlast
 		#endregion
 
 		[Header("Match Maker Options")]
-		public MatchMakerSettings settings;
+		public MatchMakerSettings matchMakerSettings;
 		public List<QueuedPlayer> queue = new List<QueuedPlayer>();
 
 		#region Public methods
@@ -145,7 +145,7 @@ namespace BattleBlast
 		}
 		private void AddPlayerToQueue(QueuedPlayer player)
 		{
-			player.SetTimeout(settings.queueTimeoutLimit, TimeoutQueuedPlayer);
+			player.SetTimeout(matchMakerSettings.queueTimeoutLimit, TimeoutQueuedPlayer);
 			queue.Add(player);
 		}
 		private QueuedPlayer GetQueueEntryFor(PlayerData player)

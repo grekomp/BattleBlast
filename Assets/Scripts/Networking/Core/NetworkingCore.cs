@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.Types;
+using Utils;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 namespace Networking
@@ -17,13 +18,15 @@ namespace Networking
 	[CreateAssetMenu(menuName = "Systems/Networking/Networking Core")]
 	public class NetworkingCore : ScriptableSystem
 	{
+		public static readonly string LogTag = "Networking";
+
 		#region Options
 		[Serializable]
 		public class Options
 		{
-			public int port = 8865;
+			public int port = 8892;
 			[Space]
-			public int broadcastPort = 8866;
+			public int broadcastPort = 8890;
 			public int broadcastKey = 8671;
 			public int broadcastVersion = 1;
 			public int broadcastSubversion = 1;
@@ -68,7 +71,11 @@ namespace Networking
 		{
 			base.OnInitialize();
 
-			NetworkTransport.Init();
+			if (NetworkTransport.IsStarted == false)
+			{
+				NetworkTransport.Init();
+				Log.Info(LogTag, "Initialized NetworkTransport.", this);
+			}
 
 			hostId = AddHost(Port);
 		}
@@ -80,7 +87,18 @@ namespace Networking
 			if (InitCheck() == false) return NetworkError.WrongOperation;
 
 			NetworkTransport.Send(HostId, connectionId, channel, data, data.Length, out byte error);
-			return (NetworkError)error;
+
+			NetworkError networkError = (NetworkError)error;
+			if (networkError == NetworkError.Ok)
+			{
+				Log.Verbose(LogTag, $"Sent data via: HostId: {HostId}, ConnectionId: {connectionId}, Channel: {channel}. \nData: {data}.", this);
+			}
+			else
+			{
+				Log.Warning(LogTag, $"Failed to send data with error: {networkError} via HostId: {HostId}, ConnectionId: {connectionId}, Channel: {channel}. \nData: {data}.", this);
+			}
+
+			return networkError;
 		}
 		#endregion
 
@@ -94,15 +112,19 @@ namespace Networking
 			do
 			{
 				eventType = NetworkTransport.Receive(out int receivedHostId, out int receivedConnectionId, out int outChannelId, buffer, buffer.Length, out int receivedSize, out byte error);
+				Log.Verbose(LogTag, $"Received network event: {eventType}, from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}, Channel: {outChannelId}.");
+
 				switch (eventType)
 				{
 					case NetworkEventType.ConnectEvent:
 						HandleConnectEvent(receivedHostId, receivedConnectionId);
 						break;
 					case NetworkEventType.DisconnectEvent:
+						Log.Verbose(LogTag, $"Disconnected from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}.");
 						HandleDisconnectEvent(receivedConnectionId);
 						break;
 					case NetworkEventType.DataEvent:
+						Log.Verbose(LogTag, $"Received data from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}. \nRaw data: {buffer}.");
 						HandleDataEvent(receivedConnectionId, buffer);
 						break;
 					case NetworkEventType.BroadcastEvent:
@@ -115,6 +137,8 @@ namespace Networking
 		private void HandleConnectEvent(int receivedHostId, int receivedConnectionId)
 		{
 			NetworkTransport.GetConnectionInfo(receivedHostId, receivedConnectionId, out string outIp, out int outPort, out NetworkID outNetwork, out NodeID outDstNode, out byte error);
+
+			// TODO: Finish implementation
 		}
 		private void HandleDisconnectEvent(int receivedConnectionId)
 		{
@@ -132,8 +156,14 @@ namespace Networking
 			NetworkTransport.GetBroadcastConnectionInfo(scanningHostId, out string senderAddress, out int senderPort, out byte broadcastError);
 			if (broadcastError == (int)NetworkError.Ok && error == (int)NetworkError.Ok)
 			{
+				Log.Verbose(LogTag, $"Received broadcast event from: HostId: {scanningHostId}, ConnectionId: {receivedConnectionId}. Sender address: {senderAddress}, Sender port: {senderPort}. \nRaw data: {buffer}.");
+
 				ReceivedBroadcastData receivedBroadcastData = new ReceivedBroadcastData(senderAddress, senderPort);
 				OnBroadcastEvent?.Raise(this, receivedBroadcastData);
+			}
+			else
+			{
+				Log.Warning(LogTag, $"Failed to read broadcast event data, GetBroadcastConnectionMessage error: {error}, GetBroadcastConnectionInfo error: {broadcastError}, from: HostId: {scanningHostId}, ConnectionId: {receivedConnectionId}.");
 			}
 		}
 		#endregion
@@ -144,18 +174,31 @@ namespace Networking
 		{
 			var topology = new HostTopology(defaultConnectionConfig, options.maxConnections);
 
+			int hostId = -1;
 			if (port >= 0)
 			{
-				return NetworkTransport.AddHost(topology, port);
+				hostId = NetworkTransport.AddHost(topology, port);
 			}
 			else
 			{
-				return NetworkTransport.AddHost(topology);
+				hostId = NetworkTransport.AddHost(topology);
 			}
+
+			Log.Info(LogTag, $"Added host with id: {hostId}", this);
+			return hostId;
 		}
 		public bool RemoveHost(int hostId)
 		{
-			return NetworkTransport.RemoveHost(hostId);
+			bool result = NetworkTransport.RemoveHost(hostId);
+			if (result)
+			{
+				Log.Info(LogTag, $"Removed host, HostId: {hostId}.");
+			}
+			else
+			{
+				Log.Warning(LogTag, $"Failed to remove host, HostId: {hostId}");
+			}
+			return result;
 		}
 		#endregion
 
@@ -169,6 +212,12 @@ namespace Networking
 
 			byte[] buffer = Utils.ObjectSerializationExtension.SerializeToByteArray(SystemInfo.deviceName);
 			NetworkTransport.StartBroadcastDiscovery(broadcastHostId, options.broadcastPort, options.broadcastKey, options.broadcastVersion, options.broadcastSubversion, buffer, buffer.Length, 1000, out byte error);
+
+			NetworkError networkError = (NetworkError)error;
+			if (networkError == NetworkError.Ok)
+			{
+				Log.Info(LogTag, $"Started broadcasting on: HostId: {broadcastHostId}, Port: {options.broadcastPort}")
+			}
 		}
 		public void StopBroadcastDiscovery()
 		{
