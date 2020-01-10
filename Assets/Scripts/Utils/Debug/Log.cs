@@ -23,7 +23,7 @@ namespace Utils
 
 		public static void PrintLog(LogLevel logLevel, string tag, object message, UnityEngine.Object context = null)
 		{
-			string logString = $"{logLevel}: {tag}: {message}";
+			string logString = $"[{logLevel.ToString().Substring(0, 3)}] {tag}: {message}";
 
 			if (context == null)
 			{
@@ -63,7 +63,7 @@ namespace Utils
 			}
 		}
 
-		public static void D(string message)
+		public static void D(object message)
 		{
 			PrintLog(LogLevel.Debug, defaultDebugTag, message);
 		}

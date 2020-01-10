@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 [RequireComponent(typeof(IntroduceHandler))]
 [RequireComponent(typeof(IntroduceResponseSender))]
 [RequireComponent(typeof(IntroduceConfirmHandler))]
@@ -197,3 +198,4 @@ public class ConnectionClient : Connection
 	}
 	#endregion
 }
+#pragma warning restore CS0618 // Type or member is obsolete

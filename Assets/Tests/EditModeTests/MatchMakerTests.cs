@@ -47,7 +47,7 @@ namespace Tests
 		[UnityTest]
 		public IEnumerator Should_AddPlayerToQueue_IfMatchCannotBeFoundInstantly()
 		{
-			yield return TestExtensions.RunTaskAsIEnumerator(async () =>
+			yield return TaskExtensions.RunTaskAsIEnumerator(async () =>
 			{
 				var task1 = Server.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
 				Assert.That(task1.IsCompleted, Is.False);
@@ -58,7 +58,7 @@ namespace Tests
 		[UnityTest]
 		public IEnumerator Should_NotAddPlayerToQueue_IfPlayerIsAlreadyInQueue()
 		{
-			yield return TestExtensions.RunTaskAsIEnumerator(async () =>
+			yield return TaskExtensions.RunTaskAsIEnumerator(async () =>
 			{
 				var task1 = Server.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
 				var task2 = Server.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
@@ -74,7 +74,7 @@ namespace Tests
 		[UnityTest]
 		public IEnumerator Should_RemovePlayerFromQueue_IfCancellationWasRequested()
 		{
-			yield return TestExtensions.RunTaskAsIEnumerator(async () =>
+			yield return TaskExtensions.RunTaskAsIEnumerator(async () =>
 			{
 				var task1 = Server.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
 				Assert.That(Server.MatchMaker.IsPlayerInQueue(testPlayer01), Is.True);
@@ -98,7 +98,7 @@ namespace Tests
 		[UnityTest]
 		public IEnumerator Should_FindAMatch_IfThereAreValidQueuedPlayers()
 		{
-			yield return TestExtensions.RunTaskAsIEnumerator(async () =>
+			yield return TaskExtensions.RunTaskAsIEnumerator(async () =>
 			{
 				var task1 = Server.MatchMaker.FindAMatch(testPlayer02, new MatchMakingSettings());
 				Assert.That(Server.MatchMaker.queue.Count, Is.EqualTo(1));
@@ -124,7 +124,7 @@ namespace Tests
 		[UnityTest]
 		public IEnumerator Should_FailToFindAMatch_AfterTimeout()
 		{
-			yield return TestExtensions.RunTaskAsIEnumerator(async () =>
+			yield return TaskExtensions.RunTaskAsIEnumerator(async () =>
 			{
 				var task = Server.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
 
@@ -140,7 +140,7 @@ namespace Tests
 		[UnityTest]
 		public IEnumerator Should_FailToFindAMatch_IfOtherPlayersHaveInvalidMatchMakingSetting()
 		{
-			yield return TestExtensions.RunTaskAsIEnumerator(async () =>
+			yield return TaskExtensions.RunTaskAsIEnumerator(async () =>
 			{
 				var task1 = Server.MatchMaker.FindAMatch(testPlayer01, new InvalidMatchMakingSettings());
 				var task2 = Server.MatchMaker.FindAMatch(testPlayer02, new MatchMakingSettings());

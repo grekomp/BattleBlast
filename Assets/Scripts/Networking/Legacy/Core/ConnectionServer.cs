@@ -4,12 +4,14 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 [RequireComponent(typeof(IntroduceSender))]
 [RequireComponent(typeof(IntroduceResponseHandler))]
 [RequireComponent(typeof(IntroduceConfirmSender))]
-public class ConnectionServer : Connection {
+public class ConnectionServer : Connection
+{
 	#region CLIENT_MANAGEMENT
-	public event Action<ClientData> onClientDataUpdate;
+	//public event Action<ClientData> onClientDataUpdate;
 	/// <summary>
 	/// Happens after introductory exchange. Later than Connection.ConnectEvent
 	/// </summary>
@@ -29,11 +31,13 @@ public class ConnectionServer : Connection {
 	}
 	[SerializeField] ClientManager clientManager;
 
-	public ClientData ClientFromConnectionId(int id) {
+	public ClientData ClientFromConnectionId(int id)
+	{
 		return clientManager.clients.Find(x => x.connectionId == id);
 	}
 
-	public ClientData ClientFromDeviceId(string id) {
+	public ClientData ClientFromDeviceId(string id)
+	{
 		return clientManager.clients.Find(x => x.deviceId == id);
 	}
 
@@ -45,26 +49,31 @@ public class ConnectionServer : Connection {
 	IntroduceSender introduceSender;
 	IntroduceConfirmSender introduceConfirmSender;
 
-	protected override void ConnectEvent(int outConnectionId, string otherIp) {
+	protected override void ConnectEvent(int outConnectionId, string otherIp)
+	{
 		clientManager.OnClientConnected(outConnectionId, otherIp);
 		introduceSender.SendIntroduction(outConnectionId);
 	}
 
-	protected override void DisconnectEvent(int outConnectionId) {
+	protected override void DisconnectEvent(int outConnectionId)
+	{
 		base.DisconnectEvent(outConnectionId);
 		ClientData data = clientManager.OnClientDisconnected(outConnectionId);
-		if (data != null) {
+		if (data != null)
+		{
 			DebugNet.Log(string.Format("Lost {0}.", data.ToString()));
 			onClientDisconnected?.Invoke(data);
 			onClientListUpdate?.Invoke();
 		}
 	}
 
-	protected override void HandleDataEvent(int connectionId, Order order, string data) {
+	protected override void HandleDataEvent(int connectionId, Order order, string data)
+	{
 		base.HandleDataEvent(connectionId, order, data);
 	}
 
-	protected override void InitNewInstance() {
+	protected override void InitNewInstance()
+	{
 		base.InitNewInstance();
 		introduceSender = GetComponent<IntroduceSender>();
 		introduceConfirmSender = GetComponent<IntroduceConfirmSender>();
@@ -72,19 +81,23 @@ public class ConnectionServer : Connection {
 		clientManager = new ClientManager();
 		clientManager.Init();
 		clientManager.onAddClientData += FireOnClientConnected;
-		IntroduceResponseHandler.onIntroduceResponse += (x) => {
+		IntroduceResponseHandler.onIntroduceResponse += (x) =>
+		{
 			introduceConfirmSender.Send(x.clientId);
 		};
 	}
 
-	void FireOnClientConnected(ClientData client) {
+	void FireOnClientConnected(ClientData client)
+	{
 		base.ConnectEvent(client.connectionId, client.ip);
 		onClientConnected?.Invoke(client);
 		onClientListUpdate?.Invoke();
 	}
 
-	void StartBroadcast() {
-		if (!NetworkTransport.IsBroadcastDiscoveryRunning()) {
+	void StartBroadcast()
+	{
+		if (!NetworkTransport.IsBroadcastDiscoveryRunning())
+		{
 			broadcastHostId = OpenHost(0);
 			byte error;
 			byte[] buffor = Serializator.GetBytes(SystemInfo.deviceName);
@@ -94,31 +107,37 @@ public class ConnectionServer : Connection {
 		}
 	}
 
-	void StopBroadcast() {
+	void StopBroadcast()
+	{
 		NetworkTransport.StopBroadcastDiscovery();
 		DebugNet.Log("Stopped broadcasting.");
 		CloseHost(broadcastHostId);
 	}
 
-	protected override void OnDestroy() {
+	protected override void OnDestroy()
+	{
 		StopBroadcast();
 		base.OnDestroy();
 	}
 
-	public override NetworkError Send(Order order, Channel channel, OrderData data) {
+	public override NetworkError Send(Order order, Channel channel, OrderData data)
+	{
 		NetworkError toReturn = NetworkError.Ok;
 		List<ClientData> clients = clientManager.clients;
-		foreach (ClientData client in clients) {
+		foreach (ClientData client in clients)
+		{
 			data.clientId = client.clientId;
 			NetworkError error = Send(client.connectionId, order, channel, data);
-			if (error != NetworkError.Ok) {
+			if (error != NetworkError.Ok)
+			{
 				toReturn = error;
 			}
 		}
 		return toReturn;
 	}
 
-	public override NetworkError Send(int connectionId, Order order, Channel channel, OrderData data) {
+	public override NetworkError Send(int connectionId, Order order, Channel channel, OrderData data)
+	{
 		data.clientId = connectionId;
 		return base.Send(connectionId, order, channel, data);
 	}
@@ -131,3 +150,4 @@ public class ConnectionServer : Connection {
 	}
 	#endregion
 }
+#pragma warning restore CS0618 // Type or member is obsolete

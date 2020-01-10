@@ -8,7 +8,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.Types;
 
-public abstract class Connection : MonoBehaviour {
+#pragma warning disable CS0618 // Type or member is obsolete
+public abstract class Connection : MonoBehaviour
+{
 	public enum Channel { Reliable, Unreliable, FileTransfer };
 	public int connectionHostId { private set; get; }
 
@@ -30,8 +32,10 @@ public abstract class Connection : MonoBehaviour {
 
 	static OrderHandlerManager dataReceivedHandler;
 
-	protected virtual void Update() {
-		if (!IsReady) {
+	protected virtual void Update()
+	{
+		if (!IsReady)
+		{
 			return;
 		}
 
@@ -46,9 +50,11 @@ public abstract class Connection : MonoBehaviour {
 		NetworkID outNetwork;
 		NodeID outDstNode;
 		NetworkEventType eventType = NetworkEventType.Nothing;
-		do {
+		do
+		{
 			eventType = NetworkTransport.Receive(out outHostId, out outConnectionId, out outChannelId, buffer, buffer.Length, out receivedSize, out error);
-			switch (eventType) {
+			switch (eventType)
+			{
 				case NetworkEventType.ConnectEvent:
 					NetworkTransport.GetConnectionInfo(outHostId, outConnectionId, out outIp, out outPort, out outNetwork, out outDstNode, out error);
 					DebugNet.Log(string.Format("Connected on {0} id.", outConnectionId));
@@ -66,20 +72,24 @@ public abstract class Connection : MonoBehaviour {
 		} while (eventType != NetworkEventType.Nothing);
 	}
 
-	protected virtual void ConnectEvent(int outConnectionId, string otherIp) {
+	protected virtual void ConnectEvent(int outConnectionId, string otherIp)
+	{
 		onConnected?.Invoke(outConnectionId);
 	}
-	protected virtual void DisconnectEvent(int outConnectionId) {
+	protected virtual void DisconnectEvent(int outConnectionId)
+	{
 		onDisconnected?.Invoke(outConnectionId);
 	}
 
-	protected virtual void HandleDataEvent(int connectionId, Order order, string data) {
+	protected virtual void HandleDataEvent(int connectionId, Order order, string data)
+	{
 		DebugNet.Log(string.Format("Got order {0} with data {1}.",
 			order, data));
 		dataReceivedHandler.ParseData(connectionId, order, data);
 	}
 
-	void DataEvent(int connectionId, byte[] buffer) {
+	void DataEvent(int connectionId, byte[] buffer)
+	{
 		string bufferString = Serializator.GetObject<string>(buffer);
 		string data;
 		Order order = OrderParser.ParseMessage(bufferString, out data);
@@ -88,10 +98,12 @@ public abstract class Connection : MonoBehaviour {
 
 	public abstract NetworkError Send(Order order, Channel channel, OrderData data);
 
-	public virtual NetworkError Send(int connectionId, Order order, Channel channel, OrderData data) {
+	public virtual NetworkError Send(int connectionId, Order order, Channel channel, OrderData data)
+	{
 		byte error;
 		string jsonData = JsonUtility.ToJson(data);
-		if (!IsReady) {
+		if (!IsReady)
+		{
 			DebugNet.Log(string.Format("Cannot send data without connection!. Order: {0} with data: {1}", order, jsonData));
 			return NetworkError.WrongOperation;
 		}
@@ -101,7 +113,8 @@ public abstract class Connection : MonoBehaviour {
 		return (NetworkError)error;
 	}
 
-	protected int OpenHost(int? port = null) {
+	protected int OpenHost(int? port = null)
+	{
 		ConnectionConfig config = new ConnectionConfig();
 		config.DisconnectTimeout = 5000;
 		config.AddChannel(QosType.ReliableSequenced);
@@ -109,32 +122,39 @@ public abstract class Connection : MonoBehaviour {
 		config.AddChannel(QosType.ReliableFragmentedSequenced);
 		HostTopology topology = new HostTopology(config, 32);
 		int hostId = -1;
-		if (port != null) {
+		if (port != null)
+		{
 			hostId = NetworkTransport.AddHost(topology, port.GetValueOrDefault());
 		}
-		else {
+		else
+		{
 			hostId = NetworkTransport.AddHost(topology);
 		}
 		DebugNet.Log("Opened host " + hostId);
 		return hostId;
 	}
 
-	protected void CloseHost(int id) {
+	protected void CloseHost(int id)
+	{
 		NetworkTransport.RemoveHost(id);
 		DebugNet.Log("Closed host " + id);
 	}
 
-	protected virtual void InitNewInstance() {
-		if (!NetworkTransport.IsStarted) {
+	protected virtual void InitNewInstance()
+	{
+		if (!NetworkTransport.IsStarted)
+		{
 			NetworkTransport.Init();
 		}
 		connectionHostId = OpenHost(connectPort);
 		dataReceivedHandler = new OrderHandlerManager();
 	}
 
-	protected virtual void OnDestroy() {
+	protected virtual void OnDestroy()
+	{
 		CloseHost(connectionHostId);
-		if (NetworkTransport.IsStarted) {
+		if (NetworkTransport.IsStarted)
+		{
 			NetworkTransport.Shutdown();
 		}
 	}
@@ -148,20 +168,24 @@ public abstract class Connection : MonoBehaviour {
 
 	public static Connection baseInstance {
 		private set {
-			if (value == null || _baseInstance != null) {
+			if (value == null || _baseInstance != null)
+			{
 				Debug.LogError("Something went terribly wrong.");
 			}
-			if (_baseInstance != value) {
+			if (_baseInstance != value)
+			{
 				_baseInstance = value;
 				_baseInstance.InitNewInstance();
 				if (_baseInstance.GetComponent<DontDestroyThis>() == null
-					&& Application.isPlaying) {
+					&& Application.isPlaying)
+				{
 					_baseInstance.gameObject.AddComponent<DontDestroyThis>();
 				}
 			}
 		}
 		get {
-			if (_baseInstance == null) {
+			if (_baseInstance == null)
+			{
 				return FindObjectOfType<Connection>();
 			}
 			return _baseInstance;
@@ -169,42 +193,53 @@ public abstract class Connection : MonoBehaviour {
 	}
 	static Connection _baseInstance;
 
-	protected static T GetInstance<T, U>() where T : Connection where U : Connection {
-		if (baseInstance != null && baseInstance as T != null) {
+	protected static T GetInstance<T, U>() where T : Connection where U : Connection
+	{
+		if (baseInstance != null && baseInstance as T != null)
+		{
 			return baseInstance as T;
 		}
 		T instanceToSet = FindObjectOfType<T>();
-		if (instanceToSet != null) {
+		if (instanceToSet != null)
+		{
 			baseInstance = instanceToSet;
 			return baseInstance as T;
 		}
 		U otherClass = FindObjectOfType<U>();
-		if (otherClass == null) {
+		if (otherClass == null)
+		{
 			CreateNewInstance<T>();
 		}
-		else {
+		else
+		{
 			Debug.LogError("Cannot create " + typeof(T).Name + " since "
 				+ typeof(U).Name + " exists.", otherClass);
 		}
 		return baseInstance as T;
 	}
 
-	protected static void CreateNewInstance<T>() where T : Connection {
+	protected static void CreateNewInstance<T>() where T : Connection
+	{
 		GameObject newGO = new GameObject(typeof(T).Name);
 		newGO.AddComponent<T>();
 	}
 
-	void Awake() {
-		if (_baseInstance != null && _baseInstance != this) {
+	void Awake()
+	{
+		if (_baseInstance != null && _baseInstance != this)
+		{
 			Destroy(this.gameObject);
 			return;
 		}
-		else if (_baseInstance == this) {
+		else if (_baseInstance == this)
+		{
 			return;
 		}
-		else {
+		else
+		{
 			baseInstance = this;
 		}
 	}
 	#endregion
 }
+#pragma warning restore CS0618 // Type or member is obsolete

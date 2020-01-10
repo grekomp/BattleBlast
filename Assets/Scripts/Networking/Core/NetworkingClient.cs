@@ -3,14 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using Utils;
 
 namespace Networking
 {
-	[CreateAssetMenu(menuName = "Systems/Networking/Networking Client")]
-	public class NetworkingClient : ScriptableSystem<NetworkingClient>
+	public class NetworkingClient : DontDestroySingleton<NetworkingClient>
 	{
+		private static string LogTag = nameof(NetworkingClient);
+
 		[Serializable]
 		public class ServerInfo
 		{
@@ -32,8 +35,15 @@ namespace Networking
 			}
 		}
 
+		[Serializable]
+		public class NetworkingClientSettings
+		{
+			public int connectToServerTimeout = 100;
+		}
+
 		[Header("Networking Client Options")]
 		[SerializeField] protected NetworkingCore networkingCore;
+		[SerializeField] protected NetworkingClientSettings networkingClientSettings;
 
 		[Header("Runtime Variables")]
 		[SerializeField]
@@ -44,9 +54,8 @@ namespace Networking
 
 
 		#region Initialization
-		protected override void OnInitialize()
+		protected void Awake()
 		{
-			base.OnInitialize();
 
 			if (networkingCore == null) networkingCore = ScriptableObject.CreateInstance<NetworkingCore>();
 			networkingCore.Initialize();
@@ -59,14 +68,42 @@ namespace Networking
 		#region Managing Connection
 		protected TaskCompletionSource<ReceivedBroadcastData> broadcastEventReceivedTaskCompletionSource;
 
+		[ContextMenu("TryConnectToServer")]
 		/// <summary>
 		/// Attempts to automatically connect to any available server.
 		/// </summary>
 		/// <returns></returns>
-		public async Task<bool> ConnectToServer()
+		public async void TryConnectToServer()
+		{
+			Log.Info(LogTag, "Trying to connect to server...", this);
+
+			bool result = false;
+			try
+			{
+				result = await ConnectToServer(TaskExtensions.GetTimeoutCancellationToken(networkingClientSettings.connectToServerTimeout));
+
+			}
+			catch (TaskCanceledException exception)
+			{
+				Log.Verbose(LogTag, "Connecting to server timed out.", this);
+			}
+
+
+			if (result)
+			{
+				Log.Info(LogTag, "Connected to server.", this);
+			}
+			else
+			{
+				Log.Info(LogTag, "Failed to connect to server.", this);
+			}
+		}
+
+		public async Task<bool> ConnectToServer(CancellationToken cancellationToken)
 		{
 			// Start looking for server
 			broadcastEventReceivedTaskCompletionSource = new TaskCompletionSource<ReceivedBroadcastData>();
+			cancellationToken.Register(() => { broadcastEventReceivedTaskCompletionSource.TrySetCanceled(); });
 			networkingCore.OnBroadcastEvent.RegisterListenerOnce(HandleBroadcastEvent);
 			networkingCore.StartScanningForBroadcast();
 
@@ -166,6 +203,13 @@ namespace Networking
 		public GameEventHandler OnDisconnect;
 		public GameEventHandler OnDataReceived;
 		public GameEventHandler OnDataSent;
+		#endregion
+
+		#region Cleanup
+		private void OnDestroy()
+		{
+			networkingCore?.Dispose();
+		}
 		#endregion
 	}
 }

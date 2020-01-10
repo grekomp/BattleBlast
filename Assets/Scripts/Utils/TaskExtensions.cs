@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public static class TestExtensions
+public static class TaskExtensions
 {
 	public static IEnumerator AsIEnumerator(this Task task)
 	{
@@ -42,8 +42,10 @@ public static class TestExtensions
 		return AsIEnumerator(Task.Run(function, ct));
 	}
 
-	internal static CancellationToken GetTimeoutCancellationToken(int v)
+	internal static CancellationToken GetTimeoutCancellationToken(int timeoutMs)
 	{
-		throw new NotImplementedException();
+		CancellationTokenSource cts = new CancellationTokenSource();
+		cts.CancelAfter(timeoutMs);
+		return cts.Token;
 	}
 }

@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class LobbyOnDisconnect : MonoBehaviour
 {
-	[SerializeField] string sceneName;
-	[SerializeField] GameEvent presentationUnloaded;
+	[SerializeField] protected string sceneName;
+	[SerializeField] protected GameEvent presentationUnloaded;
 	void Awake()
 	{
 		ConnectionClient.instance.onDisconnectedFromServer += LoadLobby;

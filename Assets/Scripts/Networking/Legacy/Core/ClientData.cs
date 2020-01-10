@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 [System.Serializable]
 public class ClientData
 {
@@ -55,3 +56,4 @@ public class ClientData
 		return ping;
 	}
 }
+#pragma warning restore CS0618 // Type or member is obsolete

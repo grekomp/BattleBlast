@@ -69,14 +69,18 @@ namespace Networking
 		public GameEventHandler OnBroadcastEvent = new GameEventHandler();
 
 		#region Initialization
+		[ContextMenu("Initialize")]
 		public void Initialize()
 		{
+			if (IsInitialized) return;
+
 			if (NetworkTransport.IsStarted == false)
 			{
 				NetworkTransport.Init();
 				Log.Info(LogTag, "Initialized NetworkTransport.", this);
 			}
 
+			Log.Info(LogTag, $"Initializing networking core: {this}.", this);
 			AddDefaultHost();
 			IsInitialized = true;
 		}
@@ -109,6 +113,7 @@ namespace Networking
 		#endregion
 
 		#region Handling Incoming Events
+		[ContextMenu("Update")]
 		public void Update()
 		{
 			if (IsInitialized == false) return;
@@ -118,6 +123,8 @@ namespace Networking
 			do
 			{
 				eventType = NetworkTransport.Receive(out int receivedHostId, out int receivedConnectionId, out int outChannelId, buffer, buffer.Length, out int receivedSize, out byte error);
+				if (eventType == NetworkEventType.Nothing) break;
+
 				Log.Verbose(LogTag, $"Received network event: {eventType}, from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}, Channel: {outChannelId}.");
 
 				switch (eventType)
@@ -195,6 +202,12 @@ namespace Networking
 		}
 		public bool RemoveHost(int hostId)
 		{
+			if (hostId < 0)
+			{
+				Log.Warning(LogTag, $"{nameof(RemoveHost)}: Host Id is less than zero, aborting. HostId: {hostId}.");
+				return false;
+			}
+
 			bool result = NetworkTransport.RemoveHost(hostId);
 			if (result)
 			{
@@ -209,6 +222,7 @@ namespace Networking
 		#endregion
 
 		#region Broadcast Discovery
+		[ContextMenu("Start Broadcast Discovery")]
 		public void StartBroadcastDiscovery()
 		{
 			if (InitCheck() == false) return;
@@ -224,20 +238,42 @@ namespace Networking
 			{
 				Log.Info(LogTag, $"Started broadcasting on: HostId: {broadcastHostId}, Port: {options.broadcastPort}");
 			}
+			else
+			{
+				Log.Error(LogTag, $"Failed to start broadcast discovery with error: {networkError}.");
+			}
 		}
+		[ContextMenu("Stop Broadcast Discovery")]
 		public void StopBroadcastDiscovery()
 		{
-			NetworkTransport.StopBroadcastDiscovery();
-			RemoveHost(broadcastHostId);
+			if (IsBroadcasting)
+			{
+				NetworkTransport.StopBroadcastDiscovery();
+				RemoveHost(broadcastHostId);
+				Log.Info(LogTag, $"Stopped broadcasting on: HostId: {broadcastHostId}, Port: {options.broadcastPort}");
+			}
+			broadcastHostId = -1;
 		}
 
+		[ContextMenu("Start Scanning For Broadcast")]
 		public void StartScanningForBroadcast()
 		{
 			if (IsScanningForBroadcast) return;
 
 			scanningHostId = AddHost(options.broadcastPort);
 			NetworkTransport.SetBroadcastCredentials(scanningHostId, options.broadcastKey, 1, 1, out byte error);
+
+			NetworkError networkError = (NetworkError)error;
+			if (networkError == NetworkError.Ok)
+			{
+				Log.Info(LogTag, $"Started scanning for broadcast on: HostId: {scanningHostId}, Key: {options.broadcastKey}");
+			}
+			else
+			{
+				Log.Error(LogTag, $"Failed to start scanning for broadcast with error: {networkError}.");
+			}
 		}
+		[ContextMenu("Stop Scanning For Broadcast")]
 		public void StopScanningForBroadcast()
 		{
 			if (IsScanningForBroadcast)
@@ -274,13 +310,17 @@ namespace Networking
 		#endregion
 
 		#region Cleanup
+		[ContextMenu("Dispose")]
 		public void Dispose()
 		{
 			if (IsInitialized == false) return;
+			IsInitialized = false;
 
 			StopBroadcastDiscovery();
 			StopScanningForBroadcast();
 			RemoveHost(HostId);
+
+			hostId = -1;
 
 			Log.Info(LogTag, $"Disposed networking core: {this}");
 		}
