@@ -16,7 +16,7 @@ namespace Networking
 	/// Low-level core networking class, abstracting the actual network implementation.
 	/// </summary>
 	[CreateAssetMenu(menuName = "Systems/Networking/Networking Core")]
-	public class NetworkingCore : ScriptableSystem
+	public class NetworkingCore : ScriptableObject
 	{
 		public static readonly string LogTag = "Networking";
 
@@ -60,6 +60,8 @@ namespace Networking
 		private bool IsBroadcasting => NetworkTransport.IsBroadcastDiscoveryRunning();
 		private bool IsScanningForBroadcast => ScanningHostId >= 0;
 
+		public bool IsInitialized { get; private set; }
+
 		[Header("Events")]
 		public GameEventHandler OnConnectEvent = new GameEventHandler();
 		public GameEventHandler OnDisconnectEvent = new GameEventHandler();
@@ -67,16 +69,20 @@ namespace Networking
 		public GameEventHandler OnBroadcastEvent = new GameEventHandler();
 
 		#region Initialization
-		protected override void OnInitialize()
+		public void Initialize()
 		{
-			base.OnInitialize();
-
 			if (NetworkTransport.IsStarted == false)
 			{
 				NetworkTransport.Init();
 				Log.Info(LogTag, "Initialized NetworkTransport.", this);
 			}
 
+			AddDefaultHost();
+			IsInitialized = true;
+		}
+
+		private void AddDefaultHost()
+		{
 			hostId = AddHost(Port);
 		}
 		#endregion
@@ -103,7 +109,7 @@ namespace Networking
 		#endregion
 
 		#region Handling Incoming Events
-		public override void Update()
+		public void Update()
 		{
 			if (IsInitialized == false) return;
 
@@ -216,7 +222,7 @@ namespace Networking
 			NetworkError networkError = (NetworkError)error;
 			if (networkError == NetworkError.Ok)
 			{
-				Log.Info(LogTag, $"Started broadcasting on: HostId: {broadcastHostId}, Port: {options.broadcastPort}")
+				Log.Info(LogTag, $"Started broadcasting on: HostId: {broadcastHostId}, Port: {options.broadcastPort}");
 			}
 		}
 		public void StopBroadcastDiscovery()
@@ -264,6 +270,19 @@ namespace Networking
 		{
 			NetworkTransport.Disconnect(HostId, connectionId, out byte error);
 			return (NetworkError)error;
+		}
+		#endregion
+
+		#region Cleanup
+		public void Dispose()
+		{
+			if (IsInitialized == false) return;
+
+			StopBroadcastDiscovery();
+			StopScanningForBroadcast();
+			RemoveHost(HostId);
+
+			Log.Info(LogTag, $"Disposed networking core: {this}");
 		}
 		#endregion
 
