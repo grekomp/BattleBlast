@@ -21,7 +21,7 @@ namespace Networking
 			if (serializableData.GetType().IsSerializable == false)
 				throw new ArgumentException($"{nameof(NetworkingDataPackage)}: Error: Cannot create data package from {serializableData}, as it is not serializable.");
 
-			string dataType = serializableData.GetType().Name;
+			string dataType = serializableData.GetType().FullName;
 			byte[] serializedData = Utils.ObjectSerializationExtension.SerializeToByteArray(serializableData);
 			return new NetworkingDataPackage(dataType, serializedData);
 		}

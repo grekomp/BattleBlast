@@ -61,10 +61,10 @@ namespace Networking
 		#endregion
 
 		#region Handling events
-		public GameEventHandler OnDataEvent;
-		public GameEventHandler OnConnectEvent;
-		public GameEventHandler OnDisconnectEvent;
-		public GameEventHandler OnBroadcastEvent;
+		public GameEventHandler OnDataEvent = new GameEventHandler();
+		public GameEventHandler OnConnectEvent = new GameEventHandler();
+		public GameEventHandler OnDisconnectEvent = new GameEventHandler();
+		public GameEventHandler OnBroadcastEvent = new GameEventHandler();
 
 		public void HandleDataEvent(NetworkingReceivedData receivedData)
 		{
