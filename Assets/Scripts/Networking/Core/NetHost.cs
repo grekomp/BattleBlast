@@ -61,25 +61,30 @@ namespace Networking
 		#endregion
 
 		#region Handling events
-		public void HandleReceivedEvent(NetworkEventType eventType, int receivedConnectionId, int channelId, byte[] buffer, int bufferSize, int receivedSize, byte error)
+		public GameEventHandler OnDataEvent;
+		public GameEventHandler OnConnectEvent;
+		public GameEventHandler OnDisconnectEvent;
+		public GameEventHandler OnBroadcastEvent;
+
+		public void HandleDataEvent(NetworkingReceivedData receivedData)
 		{
-			switch (eventType)
-			{
-				case NetworkEventType.DataEvent:
-					break;
-				case NetworkEventType.ConnectEvent:
-
-					break;
-				case NetworkEventType.DisconnectEvent:
-
-					break;
-				case NetworkEventType.Nothing:
-					break;
-				case NetworkEventType.BroadcastEvent:
-					break;
-				default:
-					break;
-			}
+			receivedData.connection.HandleDataEvent(receivedData);
+			OnDataEvent?.Raise(this, receivedData);
+		}
+		public void HandleConnectEvent(NetConnection connection)
+		{
+			connection.HandleConnectEvent();
+			OnConnectEvent?.Raise(this, connection);
+		}
+		public void HandleDisconnectEvent(NetConnection connection)
+		{
+			connection.HandleDisconnectEvent();
+			OnDisconnectEvent?.Raise(this, connection);
+		}
+		public void HandleBroadcastEvent(ReceivedBroadcastData receivedBroadcastData)
+		{
+			receivedBroadcastData.connection.HandleBroadcastEvent();
+			OnBroadcastEvent?.Raise(this, receivedBroadcastData);
 		}
 		#endregion
 

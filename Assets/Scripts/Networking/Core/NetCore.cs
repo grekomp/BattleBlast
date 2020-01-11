@@ -123,7 +123,7 @@ namespace Networking
 						break;
 					case NetworkEventType.DataEvent:
 						Log.Verbose(LogTag, $"Received data from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}. \nRaw data: {buffer}.");
-						HandleDataEvent(receivedConnectionId, buffer);
+						HandleDataEvent(receivedHostId, receivedConnectionId, buffer);
 						break;
 					case NetworkEventType.BroadcastEvent:
 						HandleBroadcastEvent(receivedHostId, receivedConnectionId);
@@ -157,13 +157,21 @@ namespace Networking
 		private void HandleDisconnectEvent(int receivedHostId, int receivedConnectionId)
 		{
 			NetHost host = GetHost(receivedHostId);
-			host?.RemoveConnection(receivedConnectionId);
+			NetConnection connection = host.GetConnection(receivedConnectionId);
+			host.RemoveConnection(receivedConnectionId);
+
+			host.HandleDisconnectEvent(connection);
 			OnDisconnectEvent?.Raise(this, receivedConnectionId);
 		}
-		protected void HandleDataEvent(int receivedConnectionId, byte[] buffer)
+		protected void HandleDataEvent(int receivedHostId, int receivedConnectionId, byte[] buffer)
 		{
 			NetworkingDataPackage receivedDataPackage = NetworkingDataPackage.DeserializeFrom(receivedConnectionId, buffer);
-			OnDataReceivedEvent?.Raise(this, new NetworkingReceivedData(receivedConnectionId, receivedDataPackage));
+
+			NetHost host = GetHost(receivedHostId);
+			NetworkingReceivedData receivedData = new NetworkingReceivedData(host.GetConnection(receivedConnectionId), receivedDataPackage);
+
+			host.HandleDataEvent(receivedData);
+			OnDataReceivedEvent?.Raise(this, receivedData);
 		}
 		protected void HandleBroadcastEvent(int receivedHostId, int receivedConnectionId)
 		{
@@ -174,7 +182,12 @@ namespace Networking
 			{
 				Log.Verbose(LogTag, $"Received broadcast event from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}. Sender address: {senderAddress}, Sender port: {senderPort}. \nRaw data: {buffer}.");
 
-				ReceivedBroadcastData receivedBroadcastData = new ReceivedBroadcastData(senderAddress, senderPort);
+				NetHost host = GetHost(receivedHostId);
+				NetConnection connection = host.GetConnection(receivedConnectionId);
+
+				ReceivedBroadcastData receivedBroadcastData = new ReceivedBroadcastData(connection, senderAddress, senderPort);
+
+				host.HandleBroadcastEvent(receivedBroadcastData);
 				OnBroadcastEvent?.Raise(this, receivedBroadcastData);
 			}
 			else

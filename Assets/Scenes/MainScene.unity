@@ -196,11 +196,7 @@ MonoBehaviour:
   networkingClientSettings:
     connectToServerTimeout: 2000
   state: 0
-  host:
-    id: -1
-    port: -1
-    isActive: 0
-    connections: []
+  host: {fileID: 0}
   OnConnect:
     inspectedEvent: {fileID: 0}
   OnDisconnect:
@@ -361,16 +357,9 @@ MonoBehaviour:
     debugVariableReplacements: 1
     debugFailedVariableReplacements: 0
     debugChanges: 1
-  broadcastHost:
-    id: -1
-    port: -1
-    isActive: 0
-    connections: []
-  scanningHost:
-    id: -1
-    port: -1
-    isActive: 0
-    connections: []
+  broadcastHost: {fileID: 0}
+  scanningHost: {fileID: 0}
+  activeHosts: []
   OnConnectEvent:
     inspectedEvent: {fileID: 0}
   OnDisconnectEvent:

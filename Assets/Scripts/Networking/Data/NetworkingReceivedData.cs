@@ -9,19 +9,20 @@ namespace Networking
 {
 	public class NetworkingReceivedData
 	{
-		public int connectionId;
+		public NetConnection connection;
 		public Type dataType;
 		public object data;
 
-		public NetworkingReceivedData(int connectionId, Type dataType, object data)
+
+		public NetworkingReceivedData(NetConnection connection, Type dataType, object data)
 		{
-			this.connectionId = connectionId;
+			this.connection = connection;
 			this.dataType = data.GetType();
 			this.data = data;
 		}
-		public NetworkingReceivedData(int connectionId, NetworkingDataPackage dataPackage)
+		public NetworkingReceivedData(NetConnection connection, NetworkingDataPackage dataPackage)
 		{
-			this.connectionId = connectionId;
+			this.connection = connection;
 			dataType = Type.GetType(dataPackage.dataType);
 			data = dataPackage.serializedData.Deserialize();
 		}

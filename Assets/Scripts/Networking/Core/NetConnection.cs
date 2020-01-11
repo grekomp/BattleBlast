@@ -58,6 +58,18 @@ namespace Networking
 		}
 		#endregion
 
+		#region Handling events
+		public GameEventHandler OnDataEvent;
+		public GameEventHandler OnConnectEvent;
+		public GameEventHandler OnDisconnectEvent;
+		public GameEventHandler OnBroadcastEvent;
+
+		public void HandleDataEvent(NetworkingReceivedData receivedData) => OnDataEvent?.Raise(this, receivedData);
+		public void HandleConnectEvent() => OnConnectEvent?.Raise(this);
+		public void HandleDisconnectEvent() => OnDisconnectEvent?.Raise(this);
+		public void HandleBroadcastEvent() => OnBroadcastEvent?.Raise(this);
+		#endregion
+
 		#region Equals override
 		public override bool Equals(object obj)
 		{
