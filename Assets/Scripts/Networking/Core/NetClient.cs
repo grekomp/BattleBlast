@@ -136,9 +136,17 @@ namespace Networking
 			// Connect to the found server
 			if (task.Status == TaskStatus.RanToCompletion)
 			{
-				await host.ConnectWithConfirmation(broadcastData.senderAddress, broadcastData.senderPort);
-				state = ClientState.Connected;
-				return true;
+				NetConnection result = await host.ConnectWithConfirmation(broadcastData.senderAddress, broadcastData.senderPort);
+				if (result != null)
+				{
+					state = ClientState.Connected;
+					return true;
+				}
+				else
+				{
+					state = ClientState.NotConnected;
+					return false;
+				}
 			}
 			else
 			{
@@ -159,14 +167,13 @@ namespace Networking
 			return broadcastData;
 		}
 
+		[ContextMenu(nameof(DisconnectFromServer))]
 		public void DisconnectFromServer()
 		{
-			//if (IsConnected == false) return;
-			//NetworkingCore.Instance.Disconnect(connectedServerInfo.connectionId);
-			//connectedServerInfo.connectionId = -1;
+			if (IsConnected == false) return;
 
-			//OnDisconnect?.Raise(this);
-			throw new NotImplementedException();
+			host.Disconnect();
+			OnDisconnect?.Raise(this);
 		}
 
 		protected void HandleBroadcastEvent(GameEventData gameEventData)
@@ -184,12 +191,6 @@ namespace Networking
 		#endregion
 
 		#region Handling Data
-		[ContextMenu("SendTestData")]
-		public void SendTestData()
-		{
-			SendData("Test data!");
-		}
-
 		/// <summary>
 		/// Sends provided serializableData object to the server.
 		/// </summary>
@@ -219,6 +220,17 @@ namespace Networking
 			throw new NotImplementedException();
 		}
 
+		#endregion
+
+		#region Handling Events
+		protected void HandleConnect()
+		{
+			OnConnect?.Raise(this);
+		}
+		protected void HandleDisconnect()
+		{
+			OnDisconnect?.Raise(this);
+		}
 		protected void HandleDataReceived(GameEventData gameEventData)
 		{
 			if (gameEventData.data is NetworkingReceivedData receivedData)
@@ -226,18 +238,7 @@ namespace Networking
 				OnDataReceived?.Raise(this, receivedData);
 			}
 		}
-		#endregion
-
-		#region Handling Events
-		public void HandleConnect()
-		{
-			OnConnect?.Raise(this);
-		}
-		public void HandleDisconnect()
-		{
-			OnDisconnect?.Raise(this);
-		}
-		public void HandleDataSent()
+		protected void HandleDataSent()
 		{
 			OnDataSent?.Raise(this);
 		}
@@ -247,7 +248,14 @@ namespace Networking
 		public GameEventHandler OnDisconnect;
 		public GameEventHandler OnDataReceived;
 		public GameEventHandler OnDataSent;
+		#endregion
 
+		#region Test
+		[ContextMenu("SendTestData")]
+		public void SendTestData()
+		{
+			SendData("Test data!");
+		}
 		#endregion
 	}
 }

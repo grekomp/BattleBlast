@@ -97,7 +97,7 @@ namespace Networking
 		#region Managing connections
 		public async Task<NetConnection> ConnectWithConfirmation(string serverIP, int port)
 		{
-			return await NetCore.Instance.ConnectWithConfirmation(id, serverIP, port, 1);
+			return await NetCore.Instance.ConnectWithConfirmation(id, serverIP, port);
 		}
 		public NetConnection Connect(string serverIP, int port)
 		{
@@ -123,6 +123,13 @@ namespace Networking
 		public NetConnection GetConnection(int connectionId)
 		{
 			return connections.Find(c => c.Id == connectionId);
+		}
+		public void Disconnect()
+		{
+			foreach (var connection in new List<NetConnection>(connections))
+			{
+				Disconnect(connection);
+			}
 		}
 		public NetworkError Disconnect(int connectionId)
 		{

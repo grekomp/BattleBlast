@@ -149,6 +149,10 @@ namespace Networking
 					connection.ConfirmConnection();
 				}
 			}
+			else
+			{
+				Log.WTF(LogTag, $"Received a connection event on a host that is not managed properly, HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}.");
+			}
 		}
 		private void HandleDisconnectEvent(int receivedHostId, int receivedConnectionId)
 		{
@@ -248,7 +252,7 @@ namespace Networking
 			NetworkError networkError = (NetworkError)error;
 			if (networkError == NetworkError.Ok)
 			{
-				Log.Info(LogTag, $"Started broadcasting on: HostId: {broadcastHost.Id}, Port: {options.broadcastPort}");
+				Log.Info(LogTag, $"Started broadcasting on: HostId: {broadcastHost.Id}, Port: {options.broadcastPort}, Key: {options.broadcastKey}.");
 			}
 			else
 			{

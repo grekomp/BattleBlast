@@ -66,7 +66,10 @@ namespace Networking
 		}
 		public bool Equals(NetConnection other)
 		{
-			return other.Id == Id && other.GetHost() == GetHost();
+			NetHost host = GetHost != null ? GetHost() : null;
+			NetHost otherHost = other.GetHost != null ? other.GetHost() : null;
+
+			return other.Id == Id && host == otherHost;
 		}
 		public override int GetHashCode()
 		{
