@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Networking
 {
-	public class NetDataEventManager : SerializableWideClass
+	public class NetDataEventManager
 	{
 		public class RegisteredDataHandler
 		{
@@ -35,7 +35,7 @@ namespace Networking
 			}
 		}
 
-		public List<RegisteredDataHandler> registeredDataHandlers = new List<RegisteredDataHandler>();
+		protected List<RegisteredDataHandler> registeredDataHandlers = new List<RegisteredDataHandler>();
 
 		#region Managing handlers
 		public void RegisterHandler<T>(Action<T> action)
@@ -53,6 +53,10 @@ namespace Networking
 		#endregion
 
 		#region Handling data events
+		public void HandleDataGameEvent(GameEventData gameEventData)
+		{
+			if (gameEventData.data is NetworkingReceivedData receivedData) HandleDataEvent(receivedData);
+		}
 		public void HandleDataEvent(NetworkingReceivedData receivedData)
 		{
 			List<RegisteredDataHandler> validHandlersForDataType = registeredDataHandlers.FindAll(dh => dh.IsValidHandlerFor(receivedData)).ToList();

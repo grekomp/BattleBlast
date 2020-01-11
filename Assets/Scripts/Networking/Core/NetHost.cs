@@ -83,7 +83,6 @@ namespace Networking
 		}
 		public void HandleBroadcastEvent(ReceivedBroadcastData receivedBroadcastData)
 		{
-			receivedBroadcastData.connection.HandleBroadcastEvent();
 			OnBroadcastEvent?.Raise(this, receivedBroadcastData);
 		}
 		#endregion

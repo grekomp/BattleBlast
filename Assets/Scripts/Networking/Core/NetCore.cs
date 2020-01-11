@@ -183,9 +183,7 @@ namespace Networking
 				Log.Verbose(LogTag, $"Received broadcast event from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}. Sender address: {senderAddress}, Sender port: {senderPort}. \nRaw data: {buffer}.");
 
 				NetHost host = GetHost(receivedHostId);
-				NetConnection connection = host.GetConnection(receivedConnectionId);
-
-				ReceivedBroadcastData receivedBroadcastData = new ReceivedBroadcastData(connection, senderAddress, senderPort);
+				ReceivedBroadcastData receivedBroadcastData = new ReceivedBroadcastData(host, senderAddress, senderPort);
 
 				host.HandleBroadcastEvent(receivedBroadcastData);
 				OnBroadcastEvent?.Raise(this, receivedBroadcastData);
