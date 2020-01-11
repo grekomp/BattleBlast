@@ -14,6 +14,7 @@ namespace Networking
 	{
 		private static string LogTag = nameof(NetClient);
 
+		#region Inner classes
 		public enum ClientState
 		{
 			Uninitialized,
@@ -22,32 +23,13 @@ namespace Networking
 			Connected
 		}
 
-		//[Serializable]
-		//public class ServerInfo
-		//{
-		//	public int connectionId = -1;
-		//	public string address;
-		//	public int port;
-
-		//	public ServerInfo(int connectionId, string address, int port)
-		//	{
-		//		this.connectionId = connectionId;
-		//		this.address = address;
-		//		this.port = port;
-		//	}
-		//	public ServerInfo(string address, int port)
-		//	{
-		//		connectionId = -1;
-		//		this.address = address;
-		//		this.port = port;
-		//	}
-		//}
-
 		[Serializable]
 		public class NetClientSettings
 		{
 			public int connectToServerTimeout = 100;
 		}
+		#endregion
+
 
 		[Header("Networking Client Options")]
 		[SerializeField] protected NetClientSettings networkingClientSettings;
@@ -55,14 +37,17 @@ namespace Networking
 		[Header("Runtime Variables")]
 		[SerializeField] [Disabled] protected ClientState state;
 		public NetHost host;
-		//[SerializeField]
-		//[Disabled]
-		//protected ServerInfo connectedServerInfo = null;
 
-		//public bool IsConnected { get => connectedServerInfo != null && connectedServerInfo.connectionId >= 0; }
 
+		protected NetDataEventManager dataEventManager = new NetDataEventManager();
+
+
+		#region Public properties
 		public ClientState State { get => state; set => state = value; }
 		public bool IsConnected { get => host.Connections.Count > 0; }
+		public NetDataEventManager DataEventManager { get => dataEventManager; }
+		#endregion
+
 
 		#region Initialization
 		protected void Awake()
@@ -90,10 +75,11 @@ namespace Networking
 		}
 		#endregion
 
+
 		#region Managing Connection
 		protected TaskCompletionSource<ReceivedBroadcastData> broadcastEventReceivedTaskCompletionSource;
 
-		[ContextMenu("TryConnectToServer")]
+		[ContextMenu(nameof(TryConnectToServer))]
 		/// <summary>
 		/// Attempts to automatically connect to any available server.
 		/// </summary>
@@ -123,7 +109,6 @@ namespace Networking
 				Log.Info(LogTag, "Failed to connect to server.", this);
 			}
 		}
-
 		public async Task<bool> ConnectToServer(CancellationToken cancellationToken)
 		{
 			if (IsConnected) return true;
@@ -155,6 +140,15 @@ namespace Networking
 			}
 		}
 
+		[ContextMenu(nameof(DisconnectFromServer))]
+		public void DisconnectFromServer()
+		{
+			if (IsConnected == false) return;
+
+			host.Disconnect();
+			OnDisconnect?.Raise(this);
+		}
+
 		private async Task<ReceivedBroadcastData> FindServerBroadcast(CancellationToken cancellationToken)
 		{
 			broadcastEventReceivedTaskCompletionSource = new TaskCompletionSource<ReceivedBroadcastData>();
@@ -166,29 +160,8 @@ namespace Networking
 			NetCore.Instance.StopScanningForBroadcast();
 			return broadcastData;
 		}
-
-		[ContextMenu(nameof(DisconnectFromServer))]
-		public void DisconnectFromServer()
-		{
-			if (IsConnected == false) return;
-
-			host.Disconnect();
-			OnDisconnect?.Raise(this);
-		}
-
-		protected void HandleBroadcastEvent(GameEventData gameEventData)
-		{
-			if (state != ClientState.LookingForServer) return;
-
-			if (gameEventData.data is ReceivedBroadcastData receivedBroadcastData)
-			{
-				if (broadcastEventReceivedTaskCompletionSource != null)
-				{
-					broadcastEventReceivedTaskCompletionSource.TrySetResult(receivedBroadcastData);
-				}
-			}
-		}
 		#endregion
+
 
 		#region Handling Data
 		/// <summary>
@@ -219,8 +192,8 @@ namespace Networking
 		{
 			throw new NotImplementedException();
 		}
-
 		#endregion
+
 
 		#region Handling Events
 		protected void HandleConnect()
@@ -235,12 +208,25 @@ namespace Networking
 		{
 			if (gameEventData.data is NetworkingReceivedData receivedData)
 			{
+				dataEventManager.HandleDataEvent(receivedData);
 				OnDataReceived?.Raise(this, receivedData);
 			}
 		}
 		protected void HandleDataSent()
 		{
 			OnDataSent?.Raise(this);
+		}
+		protected void HandleBroadcastEvent(GameEventData gameEventData)
+		{
+			if (state != ClientState.LookingForServer) return;
+
+			if (gameEventData.data is ReceivedBroadcastData receivedBroadcastData)
+			{
+				if (broadcastEventReceivedTaskCompletionSource != null)
+				{
+					broadcastEventReceivedTaskCompletionSource.TrySetResult(receivedBroadcastData);
+				}
+			}
 		}
 
 		[Header("Events")]
@@ -250,7 +236,8 @@ namespace Networking
 		public GameEventHandler OnDataSent;
 		#endregion
 
-		#region Test
+
+		#region Debug
 		[ContextMenu("SendTestData")]
 		public void SendTestData()
 		{
