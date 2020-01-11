@@ -8,7 +8,7 @@ using System;
 [RequireComponent(typeof(IntroduceHandler))]
 [RequireComponent(typeof(IntroduceResponseSender))]
 [RequireComponent(typeof(IntroduceConfirmHandler))]
-public class ConnectionClient : Connection
+public class ConnectionClient : ConnectionBase
 {
 	public Action<ServerData> onConnectedToServer;
 	public Action<ServerData> onDisconnectedFromServer;

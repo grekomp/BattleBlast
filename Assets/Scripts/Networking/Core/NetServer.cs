@@ -8,10 +8,10 @@ using UnityEngine;
 
 namespace Networking
 {
-	public class NetworkingServer : ScriptableSystem<NetworkingServer>
+	public class NetServer : ScriptableSystem<NetServer>
 	{
 		[Header("Networking Server Options")]
-		[SerializeField] protected NetworkingCore networkingCore;
+		[SerializeField] protected NetCore networkingCore;
 
 		//[Header("Runtime Variables")]
 

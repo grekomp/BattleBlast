@@ -3,41 +3,47 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class DontDestroySingleton<T> : DontDestroySingletonBase where T : DontDestroySingletonBase {
+public abstract class DontDestroySingleton<T> : DontDestroySingletonBase where T : DontDestroySingletonBase
+{
 
 	static T _instance;
-	public static T instance {
+	public static T Instance {
 		get {
-			if (instanceExists) return _instance;
+			if (InstanceExists) return _instance;
 
 			_instance = FindObjectOfType<T>();
-			if (instanceExists) return _instance;
+			if (InstanceExists) return _instance;
 
 			CreateNewInstance();
 			return _instance;
 		}
 	}
 
-	public static bool instanceExists {
+	public static bool InstanceExists {
 		get {
-			if (_instance == null) {
+			if (_instance == null)
+			{
 				_instance = FindObjectOfType<T>();
 			}
 			return _instance != null;
 		}
 	}
 
-	protected virtual void Start() {
-        T ensureCorrectInstanceDetection = instance;
-		if (instanceExists && instance != this && instance.GetComponent<DontDestroyThis>() != null) {
+	protected virtual void Start()
+	{
+		T ensureCorrectInstanceDetection = Instance;
+		if (InstanceExists && Instance != this && Instance.GetComponent<DontDestroyThis>() != null)
+		{
 			Destroy(gameObject);
 		}
-		else {
+		else
+		{
 			if (GetComponent<DontDestroyThis>() == null && Application.isPlaying)
 				gameObject.AddComponent<DontDestroyThis>();
 		}
 	}
-	protected static void CreateNewInstance() {
+	protected static void CreateNewInstance()
+	{
 		GameObject newGO = new GameObject(typeof(T).Name);
 		_instance = newGO.AddComponent<T>();
 		_instance.InitNewInstance();

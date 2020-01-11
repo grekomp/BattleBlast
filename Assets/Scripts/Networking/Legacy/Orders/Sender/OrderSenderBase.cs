@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class OrderSenderBase<Data> : MonoBehaviour where Data : OrderData {
 
-    protected abstract Connection.Channel GetChannel();
+    protected abstract ConnectionBase.Channel GetChannel();
     protected abstract Order GetOrder();
     protected abstract Data InitNewData();
     protected Data data;
@@ -14,8 +14,8 @@ public abstract class OrderSenderBase<Data> : MonoBehaviour where Data : OrderDa
     }
 
     protected virtual void SendData() {
-        if (Connection.instanceExists && Connection.baseInstance.IsReady) {
-            Connection.baseInstance.Send(GetOrder(), GetChannel(), data);
+        if (ConnectionBase.instanceExists && ConnectionBase.baseInstance.IsReady) {
+            ConnectionBase.baseInstance.Send(GetOrder(), GetChannel(), data);
         }
         else {
             DebugNet.LogWarning("No connection instance or no connection estabilished.");
@@ -23,8 +23,8 @@ public abstract class OrderSenderBase<Data> : MonoBehaviour where Data : OrderDa
     }
 
     protected virtual void SendData(int clientId) {
-        if (Connection.instanceExists && Connection.baseInstance.IsReady) {
-            Connection.baseInstance.Send(clientId, GetOrder(), GetChannel(), data);
+        if (ConnectionBase.instanceExists && ConnectionBase.baseInstance.IsReady) {
+            ConnectionBase.baseInstance.Send(clientId, GetOrder(), GetChannel(), data);
         }
         else {
             DebugNet.LogWarning("No connection instance or no connection estabilished.");

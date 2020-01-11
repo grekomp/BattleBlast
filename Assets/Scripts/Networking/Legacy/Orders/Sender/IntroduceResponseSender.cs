@@ -9,8 +9,8 @@ public class IntroduceResponseSender : OrderSenderBase<IntroduceResponseData> {
         SendData();
     }
 
-    protected override Connection.Channel GetChannel() {
-        return Connection.Channel.Reliable;
+    protected override ConnectionBase.Channel GetChannel() {
+        return ConnectionBase.Channel.Reliable;
     }
 
     protected override Order GetOrder() {

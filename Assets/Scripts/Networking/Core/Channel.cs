@@ -8,7 +8,12 @@ namespace Networking
 {
 	public class Channel
 	{
-		public static int reliable = 0;
-		public static int unreliable = 1;
+		public const int Reliable = 0;
+		public const int ReliableSequenced = 1;
+		public const int ReliableStateUpdate = 2;
+		public const int ReliableFragmented = 3;
+		public const int Unreliable = 4;
+		public const int UnreliableSequenced = 5;
+		public const int StateUpdate = 6;
 	}
 }

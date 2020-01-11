@@ -9,7 +9,7 @@ using UnityEngine.Networking;
 using UnityEngine.Networking.Types;
 
 #pragma warning disable CS0618 // Type or member is obsolete
-public abstract class Connection : MonoBehaviour
+public abstract class ConnectionBase : MonoBehaviour
 {
 	public enum Channel { Reliable, Unreliable, FileTransfer };
 	public int connectionHostId { private set; get; }
@@ -166,7 +166,7 @@ public abstract class Connection : MonoBehaviour
 		}
 	}
 
-	public static Connection baseInstance {
+	public static ConnectionBase baseInstance {
 		private set {
 			if (value == null || _baseInstance != null)
 			{
@@ -186,14 +186,14 @@ public abstract class Connection : MonoBehaviour
 		get {
 			if (_baseInstance == null)
 			{
-				return FindObjectOfType<Connection>();
+				return FindObjectOfType<ConnectionBase>();
 			}
 			return _baseInstance;
 		}
 	}
-	static Connection _baseInstance;
+	static ConnectionBase _baseInstance;
 
-	protected static T GetInstance<T, U>() where T : Connection where U : Connection
+	protected static T GetInstance<T, U>() where T : ConnectionBase where U : ConnectionBase
 	{
 		if (baseInstance != null && baseInstance as T != null)
 		{
@@ -218,7 +218,7 @@ public abstract class Connection : MonoBehaviour
 		return baseInstance as T;
 	}
 
-	protected static void CreateNewInstance<T>() where T : Connection
+	protected static void CreateNewInstance<T>() where T : ConnectionBase
 	{
 		GameObject newGO = new GameObject(typeof(T).Name);
 		newGO.AddComponent<T>();

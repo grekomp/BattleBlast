@@ -8,7 +8,7 @@ using System;
 [RequireComponent(typeof(IntroduceSender))]
 [RequireComponent(typeof(IntroduceResponseHandler))]
 [RequireComponent(typeof(IntroduceConfirmSender))]
-public class ConnectionServer : Connection
+public class ConnectionServer : ConnectionBase
 {
 	#region CLIENT_MANAGEMENT
 	//public event Action<ClientData> onClientDataUpdate;

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -15,8 +16,7 @@ namespace Networking
 	/// <summary>
 	/// Low-level core networking class, abstracting the actual network implementation.
 	/// </summary>
-	[CreateAssetMenu(menuName = "Systems/Networking/Networking Core")]
-	public class NetworkingCore : ScriptableObject
+	public class NetCore : DontDestroySingleton<NetCore>
 	{
 		public static readonly string LogTag = "Networking";
 
@@ -24,8 +24,6 @@ namespace Networking
 		[Serializable]
 		public class Options
 		{
-			public int port = 8892;
-			[Space]
 			public int broadcastPort = 8890;
 			public int broadcastKey = 8671;
 			public int broadcastVersion = 1;
@@ -39,27 +37,17 @@ namespace Networking
 		protected Options options = new Options();
 		public ConnectionConfigReference defaultConnectionConfig;
 
-		public int Port { get => options.port; }
 		public int BroadcastPort { get => options.broadcastPort; }
 		#endregion
 
 		[Header("Runtime Variables")]
-		[SerializeField]
-		[Disabled]
-		protected int hostId = -1;
-		public int HostId { get => hostId; }
-		[SerializeField]
-		[Disabled]
-		protected int broadcastHostId = -1;
-		public int BroadcastHostId { get => broadcastHostId; }
-		[SerializeField]
-		[Disabled]
-		protected int scanningHostId = -1;
-		public int ScanningHostId { get => scanningHostId; }
+		[SerializeField] protected NetHost broadcastHost;
+		[SerializeField] protected NetHost scanningHost;
+		[Space]
+		[SerializeField] protected List<NetHost> activeHosts = new List<NetHost>();
 
 		private bool IsBroadcasting => NetworkTransport.IsBroadcastDiscoveryRunning();
-		private bool IsScanningForBroadcast => ScanningHostId >= 0;
-
+		private bool IsScanningForBroadcast => scanningHost.Id >= 0;
 		public bool IsInitialized { get; private set; }
 
 		[Header("Events")]
@@ -69,45 +57,42 @@ namespace Networking
 		public GameEventHandler OnBroadcastEvent = new GameEventHandler();
 
 		#region Initialization
+		public void Awake() => Initialize();
 		[ContextMenu("Initialize")]
 		public void Initialize()
 		{
 			if (IsInitialized) return;
 
+			Log.Info(LogTag, $"Initializing networking core: {this}.", this);
 			if (NetworkTransport.IsStarted == false)
 			{
 				NetworkTransport.Init();
 				Log.Info(LogTag, "Initialized NetworkTransport.", this);
 			}
 
-			Log.Info(LogTag, $"Initializing networking core: {this}.", this);
-			AddDefaultHost();
-			IsInitialized = true;
-		}
+			broadcastHost = NetHost.Null;
+			scanningHost = NetHost.Null;
 
-		private void AddDefaultHost()
-		{
-			hostId = AddHost(Port);
+			IsInitialized = true;
 		}
 		#endregion
 
 		#region Sending Data
-		public virtual NetworkError Send(int connectionId, int channel, byte[] data)
+		public virtual NetworkError Send(int hostId, int connectionId, int channel, byte[] data)
 		{
 			if (InitCheck() == false) return NetworkError.WrongOperation;
 
-			NetworkTransport.Send(HostId, connectionId, channel, data, data.Length, out byte error);
+			NetworkTransport.Send(hostId, connectionId, channel, data, data.Length, out byte error);
 
 			NetworkError networkError = (NetworkError)error;
 			if (networkError == NetworkError.Ok)
 			{
-				Log.Verbose(LogTag, $"Sent data via: HostId: {HostId}, ConnectionId: {connectionId}, Channel: {channel}. \nData: {data}.", this);
+				Log.Verbose(LogTag, $"Sent data via: HostId: {hostId}, ConnectionId: {connectionId}, Channel: {channel}. \nData: {data}.", this);
 			}
 			else
 			{
-				Log.Warning(LogTag, $"Failed to send data with error: {networkError} via HostId: {HostId}, ConnectionId: {connectionId}, Channel: {channel}. \nData: {data}.", this);
+				Log.Warning(LogTag, $"Failed to send data with error: {networkError} via HostId: {hostId}, ConnectionId: {connectionId}, Channel: {channel}. \nData: {data}.", this);
 			}
-
 			return networkError;
 		}
 		#endregion
@@ -134,7 +119,7 @@ namespace Networking
 						break;
 					case NetworkEventType.DisconnectEvent:
 						Log.Verbose(LogTag, $"Disconnected from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}.");
-						HandleDisconnectEvent(receivedConnectionId);
+						HandleDisconnectEvent(receivedHostId, receivedConnectionId);
 						break;
 					case NetworkEventType.DataEvent:
 						Log.Verbose(LogTag, $"Received data from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}. \nRaw data: {buffer}.");
@@ -149,12 +134,26 @@ namespace Networking
 
 		private void HandleConnectEvent(int receivedHostId, int receivedConnectionId)
 		{
-			NetworkTransport.GetConnectionInfo(receivedHostId, receivedConnectionId, out string outIp, out int outPort, out NetworkID outNetwork, out NodeID outDstNode, out byte error);
-
-			// TODO: Finish implementation
+			NetHost host = GetHost(receivedHostId);
+			if (host != null)
+			{
+				NetConnection existingConnection = host.GetConnection(receivedConnectionId);
+				if (existingConnection != null)
+				{
+					existingConnection.ConfirmConnection();
+				}
+				else
+				{
+					NetConnection connection = new NetConnection(receivedConnectionId, host);
+					host.AddConnection(connection);
+					connection.ConfirmConnection();
+				}
+			}
 		}
-		private void HandleDisconnectEvent(int receivedConnectionId)
+		private void HandleDisconnectEvent(int receivedHostId, int receivedConnectionId)
 		{
+			NetHost host = GetHost(receivedHostId);
+			host?.RemoveConnection(receivedConnectionId);
 			OnDisconnectEvent?.Raise(this, receivedConnectionId);
 		}
 		protected void HandleDataEvent(int receivedConnectionId, byte[] buffer)
@@ -165,26 +164,27 @@ namespace Networking
 		protected void HandleBroadcastEvent(int receivedHostId, int receivedConnectionId)
 		{
 			byte[] buffer = new byte[2048];
-			NetworkTransport.GetBroadcastConnectionMessage(scanningHostId, buffer, buffer.Length, out int receivedSize, out byte error);
-			NetworkTransport.GetBroadcastConnectionInfo(scanningHostId, out string senderAddress, out int senderPort, out byte broadcastError);
+			NetworkTransport.GetBroadcastConnectionMessage(receivedHostId, buffer, buffer.Length, out int receivedSize, out byte error);
+			NetworkTransport.GetBroadcastConnectionInfo(receivedHostId, out string senderAddress, out int senderPort, out byte broadcastError);
 			if (broadcastError == (int)NetworkError.Ok && error == (int)NetworkError.Ok)
 			{
-				Log.Verbose(LogTag, $"Received broadcast event from: HostId: {scanningHostId}, ConnectionId: {receivedConnectionId}. Sender address: {senderAddress}, Sender port: {senderPort}. \nRaw data: {buffer}.");
+				Log.Verbose(LogTag, $"Received broadcast event from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}. Sender address: {senderAddress}, Sender port: {senderPort}. \nRaw data: {buffer}.");
 
 				ReceivedBroadcastData receivedBroadcastData = new ReceivedBroadcastData(senderAddress, senderPort);
 				OnBroadcastEvent?.Raise(this, receivedBroadcastData);
 			}
 			else
 			{
-				Log.Warning(LogTag, $"Failed to read broadcast event data, GetBroadcastConnectionMessage error: {error}, GetBroadcastConnectionInfo error: {broadcastError}, from: HostId: {scanningHostId}, ConnectionId: {receivedConnectionId}.");
+				Log.Warning(LogTag, $"Failed to read broadcast event data, GetBroadcastConnectionMessage error: {error}, GetBroadcastConnectionInfo error: {broadcastError}, from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}.");
 			}
 		}
 		#endregion
 
 		#region Host Management
 		/// <returns>HostId</returns>
-		public int AddHost(int port = -1)
+		public NetHost AddHost(int port = -1)
 		{
+			Initialize();
 			var topology = new HostTopology(defaultConnectionConfig, options.maxConnections);
 
 			int hostId = -1;
@@ -197,27 +197,39 @@ namespace Networking
 				hostId = NetworkTransport.AddHost(topology);
 			}
 
-			Log.Info(LogTag, $"Added host with id: {hostId}", this);
-			return hostId;
+			Log.Verbose(LogTag, $"Added host with id: {hostId}", this);
+
+			NetHost netHost = NetHost.New(hostId, NetworkTransport.GetHostPort(hostId));
+			activeHosts.Add(netHost);
+			return netHost;
 		}
-		public bool RemoveHost(int hostId)
+		public bool RemoveHost(NetHost networkingHost)
 		{
-			if (hostId < 0)
+			if (IsInitialized == false) return false;
+			if (networkingHost == null)
 			{
-				Log.Warning(LogTag, $"{nameof(RemoveHost)}: Host Id is less than zero, aborting. HostId: {hostId}.");
+				Log.Warning(LogTag, $"{nameof(RemoveHost)}: Host is null, aborting.");
 				return false;
 			}
 
-			bool result = NetworkTransport.RemoveHost(hostId);
+			bool result = NetworkTransport.RemoveHost(networkingHost.Id);
 			if (result)
 			{
-				Log.Info(LogTag, $"Removed host, HostId: {hostId}.");
+				Log.Verbose(LogTag, $"Removed host, HostId: {networkingHost.Id}.");
+				networkingHost.Deactivate();
+				activeHosts.Remove(networkingHost);
+				Destroy(networkingHost);
 			}
 			else
 			{
-				Log.Warning(LogTag, $"Failed to remove host, HostId: {hostId}");
+				Log.Warning(LogTag, $"Failed to remove host, HostId: {networkingHost.Id}");
 			}
 			return result;
+		}
+
+		public NetHost GetHost(int receivedHostId)
+		{
+			return activeHosts.Find(h => h.Id == receivedHostId);
 		}
 		#endregion
 
@@ -225,18 +237,18 @@ namespace Networking
 		[ContextMenu("Start Broadcast Discovery")]
 		public void StartBroadcastDiscovery()
 		{
-			if (InitCheck() == false) return;
+			Initialize();
 			if (IsBroadcasting) return;
 
-			broadcastHostId = AddHost();
+			broadcastHost = AddHost();
 
 			byte[] buffer = Utils.ObjectSerializationExtension.SerializeToByteArray(SystemInfo.deviceName);
-			NetworkTransport.StartBroadcastDiscovery(broadcastHostId, options.broadcastPort, options.broadcastKey, options.broadcastVersion, options.broadcastSubversion, buffer, buffer.Length, 1000, out byte error);
+			NetworkTransport.StartBroadcastDiscovery(broadcastHost.Id, options.broadcastPort, options.broadcastKey, options.broadcastVersion, options.broadcastSubversion, buffer, buffer.Length, 1000, out byte error);
 
 			NetworkError networkError = (NetworkError)error;
 			if (networkError == NetworkError.Ok)
 			{
-				Log.Info(LogTag, $"Started broadcasting on: HostId: {broadcastHostId}, Port: {options.broadcastPort}");
+				Log.Info(LogTag, $"Started broadcasting on: HostId: {broadcastHost.Id}, Port: {options.broadcastPort}");
 			}
 			else
 			{
@@ -246,27 +258,32 @@ namespace Networking
 		[ContextMenu("Stop Broadcast Discovery")]
 		public void StopBroadcastDiscovery()
 		{
+			if (IsInitialized == false) return;
 			if (IsBroadcasting)
 			{
 				NetworkTransport.StopBroadcastDiscovery();
-				RemoveHost(broadcastHostId);
-				Log.Info(LogTag, $"Stopped broadcasting on: HostId: {broadcastHostId}, Port: {options.broadcastPort}");
+				RemoveHost(broadcastHost);
+				Log.Info(LogTag, $"Stopped broadcasting on: HostId: {broadcastHost.Id}, Port: {options.broadcastPort}");
 			}
-			broadcastHostId = -1;
+			if (broadcastHost != null)
+			{
+				broadcastHost = NetHost.Null;
+			}
 		}
 
 		[ContextMenu("Start Scanning For Broadcast")]
 		public void StartScanningForBroadcast()
 		{
+			Initialize();
 			if (IsScanningForBroadcast) return;
 
-			scanningHostId = AddHost(options.broadcastPort);
-			NetworkTransport.SetBroadcastCredentials(scanningHostId, options.broadcastKey, 1, 1, out byte error);
+			scanningHost = AddHost(options.broadcastPort);
+			NetworkTransport.SetBroadcastCredentials(scanningHost.Id, options.broadcastKey, 1, 1, out byte error);
 
 			NetworkError networkError = (NetworkError)error;
 			if (networkError == NetworkError.Ok)
 			{
-				Log.Info(LogTag, $"Started scanning for broadcast on: HostId: {scanningHostId}, Key: {options.broadcastKey}");
+				Log.Info(LogTag, $"Started scanning for broadcast on: HostId: {scanningHost.Id}, Key: {options.broadcastKey}");
 			}
 			else
 			{
@@ -276,53 +293,86 @@ namespace Networking
 		[ContextMenu("Stop Scanning For Broadcast")]
 		public void StopScanningForBroadcast()
 		{
+			if (IsInitialized == false) return;
 			if (IsScanningForBroadcast)
 			{
-				RemoveHost(scanningHostId);
-				scanningHostId = -1;
+				Log.Info(LogTag, $"Stopping scanning for broadcast on: HostId: {scanningHost.Id}, Key: {options.broadcastKey}");
+				RemoveHost(scanningHost);
 			}
+			scanningHost = NetHost.Null;
 		}
 		#endregion
 
 		#region Managing connections
-		public int Connect(string serverIP, int port = -1)
+		public async Task<NetConnection> ConnectWithConfirmation(int hostId, string serverIP, int port, int timeoutMs = 1000)
 		{
-			if (port < 0)
-			{
-				port = Port;
-			}
+			NetConnection connection = AddConnection(hostId, serverIP, port);
 
-			var connectionId = NetworkTransport.Connect(HostId, serverIP, port, 0, out byte error);
-			if ((NetworkError)error == NetworkError.Ok)
+			Task<bool> connectionConfirmationTask = connection.WaitForConnectionConfirmation(timeoutMs);
+			bool result = false;
+			try
 			{
-				return connectionId;
+				result = await connectionConfirmationTask;
+			}
+			catch (TaskCanceledException) { }
+
+			if (result)
+			{
+				return connection;
 			}
 			else
 			{
-				throw new Exception($"Failed to connect to server on hostId: {HostId}, serverIP: '{serverIP}', Error: {(NetworkError)error}");
+				connection.Disconnect();
+				return null;
 			}
 		}
-		public NetworkError Disconnect(int connectionId)
+
+		public NetConnection AddConnection(int hostId, string serverIP, int port)
 		{
-			NetworkTransport.Disconnect(HostId, connectionId, out byte error);
+			var connectionId = NetworkTransport.Connect(hostId, serverIP, port, 0, out byte error);
+			if ((NetworkError)error == NetworkError.Ok)
+			{
+				NetHost netHost = activeHosts.Find(h => h.Id == hostId);
+				NetConnection connection = new NetConnection(connectionId, netHost);
+				netHost.AddConnection(connection);
+
+				Log.Verbose(LogTag, $"Added new connection, HostId: {hostId}, ConnectionId: {connectionId}.", this);
+
+				return connection;
+			}
+			else
+			{
+				throw new Exception($"Failed to connect to server on hostId: {hostId}, serverIP: '{serverIP}', Error: {(NetworkError)error}");
+			}
+		}
+		public NetworkError Disconnect(int hostId, int connectionId)
+		{
+			if (IsInitialized == false) return NetworkError.WrongOperation;
+			NetworkTransport.Disconnect(hostId, connectionId, out byte error);
+			Log.Verbose(LogTag, $"Disconnected from HostId: {hostId}, ConnectionId: {connectionId}.", this);
 			return (NetworkError)error;
 		}
 		#endregion
 
 		#region Cleanup
+		public void OnDestroy() => Dispose();
 		[ContextMenu("Dispose")]
 		public void Dispose()
 		{
 			if (IsInitialized == false) return;
-			IsInitialized = false;
 
+			Log.Info(LogTag, $"Disposing networking core...");
 			StopBroadcastDiscovery();
 			StopScanningForBroadcast();
-			RemoveHost(HostId);
 
-			hostId = -1;
+			foreach (var host in new List<NetHost>(activeHosts))
+			{
+				RemoveHost(host);
+			}
 
-			Log.Info(LogTag, $"Disposed networking core: {this}");
+			IsInitialized = false;
+			NetworkTransport.Shutdown();
+			Log.Info(LogTag, $"Disposed networking core.");
 		}
 		#endregion
 
@@ -331,7 +381,7 @@ namespace Networking
 		{
 			if (IsInitialized == false)
 			{
-				Debug.LogError($"{nameof(NetworkingCore)}: Error: The networking was not initialized, remember to call {nameof(Initialize)} before executing any other actions.");
+				Debug.LogError($"{nameof(NetCore)}: Error: The networking was not initialized, remember to call {nameof(Initialize)} before executing any other actions.");
 				return false;
 			}
 
