@@ -29,7 +29,6 @@ namespace Networking
 		protected override void OnInitialize()
 		{
 			host = NetCore.Instance.AddHost();
-			host.OnDataEvent.RegisterListenerOnce(dataEventManager.HandleDataGameEvent);
 
 			// Register event listeners
 			host.OnConnectEvent.RegisterListenerOnce(HandleConnect);

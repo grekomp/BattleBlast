@@ -53,7 +53,6 @@ namespace Networking
 		protected void Awake()
 		{
 			host = NetCore.Instance.AddHost();
-			host.OnDataEvent.RegisterListenerOnce(dataEventManager.HandleDataGameEvent);
 		}
 
 		private void OnEnable()
