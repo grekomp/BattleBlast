@@ -9,7 +9,7 @@ using Utils;
 
 namespace BattleBlast
 {
-	public class ClientTesting : MonoBehaviour
+	public class ServerTesting : MonoBehaviour
 	{
 		protected Action<System.String> testDataEventHandler;
 
@@ -17,12 +17,12 @@ namespace BattleBlast
 		public void RegisterTestDataEventHandler()
 		{
 			testDataEventHandler = (System.String s) => Log.D(s);
-			NetClient.Instance.DataEventManager.RegisterHandler(testDataEventHandler);
+			NetServer.Instance.DataEventManager.RegisterHandler(testDataEventHandler);
 		}
 		[ContextMenu("Deregister test data event handler")]
 		public void DeregisterTestDataEventHandler()
 		{
-			NetClient.Instance.DataEventManager.DeregisterHandler(testDataEventHandler);
+			NetServer.Instance.DataEventManager.DeregisterHandler(testDataEventHandler);
 		}
 	}
 }
