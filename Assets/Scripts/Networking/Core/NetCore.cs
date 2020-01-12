@@ -180,12 +180,13 @@ namespace Networking
 			NetworkTransport.GetBroadcastConnectionInfo(receivedHostId, out string senderAddress, out int senderPort, out byte broadcastError);
 			if (broadcastError == (int)NetworkError.Ok && error == (int)NetworkError.Ok)
 			{
-				Log.Verbose(LogTag, $"Received broadcast event from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}. Sender address: {senderAddress}, Sender port: {senderPort}. \nRaw data: {broadcastConnectionMessageBuffer}.");
 
-				NetworkingDataPackage networkingDataPackage = NetworkingDataPackage.DeserializeFrom(receivedConnectionId, buffer);
+				NetworkingDataPackage networkingDataPackage = NetworkingDataPackage.DeserializeFrom(receivedConnectionId, broadcastConnectionMessageBuffer);
 
 				NetHost host = GetHost(receivedHostId);
-				ReceivedBroadcastData receivedBroadcastData = new ReceivedBroadcastData(host, senderAddress, senderPort, networkingDataPackage.GetDataAs<int>());
+				int broadcastMessagePort = networkingDataPackage.GetDataAs<int>();
+				Log.Verbose(LogTag, $"Received broadcast event from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}. Sender address: {senderAddress}, Sender port: {senderPort}. Broadcast message port: {broadcastMessagePort}.");
+				ReceivedBroadcastData receivedBroadcastData = new ReceivedBroadcastData(host, senderAddress, senderPort, broadcastMessagePort);
 
 				host.HandleBroadcastEvent(receivedBroadcastData);
 				OnBroadcastEvent?.Raise(this, receivedBroadcastData);
