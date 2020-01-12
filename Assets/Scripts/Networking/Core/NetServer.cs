@@ -41,10 +41,13 @@ namespace Networking
 
 
 		#region Starting and Stopping Server
+		[ContextMenu(nameof(StartServer))]
 		public void StartServer()
 		{
+			Initialize();
 			NetCore.Instance.StartBroadcastDiscovery(host.Port);
 		}
+		[ContextMenu(nameof(StopServer))]
 		public void StopServer()
 		{
 			NetCore.Instance.StopBroadcastDiscovery();
