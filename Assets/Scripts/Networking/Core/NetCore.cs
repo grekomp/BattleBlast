@@ -252,13 +252,16 @@ namespace Networking
 
 		#region Broadcast Discovery
 		[ContextMenu("Start Broadcast Discovery")]
-		public void StartBroadcastDiscovery(int portNumberToBroadcast = -1)
+		public void StartBroadcastDiscovery()
+		{
+			StartBroadcastDiscovery(options.broadcastPort);
+		}
+		public void StartBroadcastDiscovery(int portNumberToBroadcast)
 		{
 			Initialize();
 			if (IsBroadcasting) return;
 
 			broadcastHost = AddHost();
-			if (portNumberToBroadcast < 0) portNumberToBroadcast = options.broadcastPort;
 
 			byte[] buffer = NetworkingDataPackage.CreateFrom(portNumberToBroadcast).SerializeToByteArray();
 			NetworkTransport.StartBroadcastDiscovery(broadcastHost.Id, options.broadcastPort, options.broadcastKey, options.broadcastVersion, options.broadcastSubversion, buffer, buffer.Length, 1000, out byte error);
