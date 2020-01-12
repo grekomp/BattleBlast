@@ -155,7 +155,7 @@ namespace Tests
 		[TearDown]
 		public void TearDown()
 		{
-			Server.Dispose();
+			Server.DisposeStatic();
 		}
 	}
 }

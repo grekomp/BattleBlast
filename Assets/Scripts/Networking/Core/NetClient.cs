@@ -12,7 +12,7 @@ namespace Networking
 {
 	public class NetClient : DontDestroySingleton<NetClient>
 	{
-		private static string LogTag = nameof(NetClient);
+		private static readonly string LogTag = nameof(NetClient);
 
 		#region Inner classes
 		public enum ClientState
@@ -189,10 +189,6 @@ namespace Networking
 		/// </summary>
 		/// <typeparam name="T">Type of data to listen to.</typeparam>
 		/// <param name="action">Action to call when data is received.</param>
-		public void RegisterDataHandler<T>(Action<T> action)
-		{
-			throw new NotImplementedException();
-		}
 		#endregion
 
 

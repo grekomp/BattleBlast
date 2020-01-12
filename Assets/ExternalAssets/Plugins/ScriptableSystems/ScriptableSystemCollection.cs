@@ -29,7 +29,6 @@ namespace ScriptableSystems
 		{
 			foreach (var system in systems)
 			{
-
 				system?.Awake();
 			}
 		}
@@ -38,6 +37,13 @@ namespace ScriptableSystems
 			foreach (var system in systems)
 			{
 				system?.Update();
+			}
+		}
+		public void FixedUpdate()
+		{
+			foreach (var system in systems)
+			{
+				system?.FixedUpdate();
 			}
 		}
 		public void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)

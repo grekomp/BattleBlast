@@ -126,7 +126,7 @@ namespace Networking
 						HandleDataEvent(receivedHostId, receivedConnectionId, buffer);
 						break;
 					case NetworkEventType.BroadcastEvent:
-						HandleBroadcastEvent(receivedHostId, receivedConnectionId);
+						HandleBroadcastEvent(receivedHostId, receivedConnectionId, buffer);
 						break;
 				}
 			} while (eventType != NetworkEventType.Nothing);
@@ -173,17 +173,19 @@ namespace Networking
 			host.HandleDataEvent(receivedData);
 			OnDataReceivedEvent?.Raise(this, receivedData);
 		}
-		protected void HandleBroadcastEvent(int receivedHostId, int receivedConnectionId)
+		protected void HandleBroadcastEvent(int receivedHostId, int receivedConnectionId, byte[] buffer)
 		{
-			byte[] buffer = new byte[2048];
-			NetworkTransport.GetBroadcastConnectionMessage(receivedHostId, buffer, buffer.Length, out int receivedSize, out byte error);
+			byte[] broadcastConnectionMessageBuffer = new byte[2048];
+			NetworkTransport.GetBroadcastConnectionMessage(receivedHostId, broadcastConnectionMessageBuffer, broadcastConnectionMessageBuffer.Length, out int receivedSize, out byte error);
 			NetworkTransport.GetBroadcastConnectionInfo(receivedHostId, out string senderAddress, out int senderPort, out byte broadcastError);
 			if (broadcastError == (int)NetworkError.Ok && error == (int)NetworkError.Ok)
 			{
-				Log.Verbose(LogTag, $"Received broadcast event from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}. Sender address: {senderAddress}, Sender port: {senderPort}. \nRaw data: {buffer}.");
+				Log.Verbose(LogTag, $"Received broadcast event from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}. Sender address: {senderAddress}, Sender port: {senderPort}. \nRaw data: {broadcastConnectionMessageBuffer}.");
+
+				NetworkingDataPackage networkingDataPackage = NetworkingDataPackage.DeserializeFrom(receivedConnectionId, buffer);
 
 				NetHost host = GetHost(receivedHostId);
-				ReceivedBroadcastData receivedBroadcastData = new ReceivedBroadcastData(host, senderAddress, senderPort);
+				ReceivedBroadcastData receivedBroadcastData = new ReceivedBroadcastData(host, senderAddress, senderPort, networkingDataPackage.GetDataAs<int>());
 
 				host.HandleBroadcastEvent(receivedBroadcastData);
 				OnBroadcastEvent?.Raise(this, receivedBroadcastData);
@@ -250,14 +252,15 @@ namespace Networking
 
 		#region Broadcast Discovery
 		[ContextMenu("Start Broadcast Discovery")]
-		public void StartBroadcastDiscovery()
+		public void StartBroadcastDiscovery(int portNumberToBroadcast = -1)
 		{
 			Initialize();
 			if (IsBroadcasting) return;
 
 			broadcastHost = AddHost();
+			if (portNumberToBroadcast < 0) portNumberToBroadcast = options.broadcastPort;
 
-			byte[] buffer = Utils.ObjectSerializationExtension.SerializeToByteArray(SystemInfo.deviceName);
+			byte[] buffer = NetworkingDataPackage.CreateFrom(portNumberToBroadcast).SerializeToByteArray();
 			NetworkTransport.StartBroadcastDiscovery(broadcastHost.Id, options.broadcastPort, options.broadcastKey, options.broadcastVersion, options.broadcastSubversion, buffer, buffer.Length, 1000, out byte error);
 
 			NetworkError networkError = (NetworkError)error;

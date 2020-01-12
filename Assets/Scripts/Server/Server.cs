@@ -33,7 +33,7 @@ namespace BattleBlast
 			get => Instance.battleManager;
 		}
 
-		public static void Dispose()
+		public static void DisposeStatic()
 		{
 			MatchMaker.Dispose();
 		}

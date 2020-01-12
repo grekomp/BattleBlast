@@ -27,7 +27,7 @@ namespace Networking
 
 			public bool IsValidHandlerFor(NetworkingReceivedData receivedData)
 			{
-				return receivedData.dataType.IsSubclassOf(registeredType);
+				return registeredType.IsAssignableFrom(receivedData.dataType);
 			}
 			public void ExecuteHandler(NetworkingReceivedData receivedData)
 			{
@@ -66,8 +66,5 @@ namespace Networking
 			}
 		}
 		#endregion
-
-
-
 	}
 }

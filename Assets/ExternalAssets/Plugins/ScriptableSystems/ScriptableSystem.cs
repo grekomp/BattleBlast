@@ -11,12 +11,13 @@ namespace ScriptableSystems
 		public class ScriptableSystemSettings
 		{
 			public bool initializeOnAwake = true;
+			public bool disposeOnDisable = true;
 			[Space]
 			public bool playModeOnly = true;
 		}
 
 		[Header("Scriptable System Settings")]
-		public ScriptableSystemSettings settings;
+		public ScriptableSystemSettings settings = new ScriptableSystemSettings();
 
 		[NonSerialized]
 		protected bool initialized = false;
@@ -24,17 +25,47 @@ namespace ScriptableSystems
 			get { return initialized; }
 		}
 
-		public virtual void Awake() { if (settings.initializeOnAwake) Initialize(); }
-		public virtual void Update() { }
-		public virtual void FixedUpdate() { }
+		#region Handling events
+		public void Awake()
+		{
+			if (CanExecuteEvents())
+			{
+				if (settings.initializeOnAwake) Initialize();
+				OnAwake();
+			}
+		}
+		public void Update()
+		{
+			if (CanExecuteEvents()) OnUpdate();
+		}
+		public void FixedUpdate()
+		{
+			if (CanExecuteEvents()) OnFixedUpdate();
+		}
+
+		public virtual void OnDisable()
+		{
+			if (settings.disposeOnDisable) Dispose();
+		}
+
+		protected virtual void OnAwake() { }
+		protected virtual void OnUpdate() { }
+		protected virtual void OnFixedUpdate() { }
+
 		public virtual void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode) { }
 		public virtual void OnSceneUnloaded(Scene scene) { }
+
+		protected virtual bool CanExecuteEvents()
+		{
+			return settings.playModeOnly == false || EditorPlaystateHelper.IsPlaying;
+		}
+		#endregion
 
 		public virtual void Initialize()
 		{
 			if (initialized == false) OnInitialize();
 		}
-		[ContextMenu("Reinitialize")]
+		[ContextMenu("Force OnInitialize")]
 		protected virtual void OnInitialize()
 		{
 			// Prevents systems from being initialized when the editor is switching into, or out of play mode
@@ -44,6 +75,10 @@ namespace ScriptableSystems
 			}
 		}
 
+		public virtual void Dispose()
+		{
+			initialized = false;
+		}
 	}
 
 	public class ScriptableSystem<T> : ScriptableSystem where T : ScriptableSystem

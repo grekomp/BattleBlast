@@ -9,9 +9,11 @@ using UnityEditor.SceneManagement;
 using UnityEditor;
 #endif
 
-namespace ScriptableSystems {
+namespace ScriptableSystems
+{
 	[CreateAssetMenu(menuName = "Systems/ScriptableSystemsManager")]
-	public class ScriptableSystemsManager : ScriptableObject {
+	public class ScriptableSystemsManager : ScriptableObject
+	{
 		public ScriptableSystemCollection currentSystemsCollection;
 
 		protected static ScriptableSystemsManager _instance;
@@ -28,8 +30,10 @@ namespace ScriptableSystems {
 #else
 		[RuntimeInitializeOnLoadMethod]
 #endif
-		public static void Initialize() {
-			if (_instance == null) {
+		public static void Initialize()
+		{
+			if (_instance == null)
+			{
 				// Initializing the ScriptableSystemsManager
 				var found = Resources.LoadAll<ScriptableSystemsManager>("Systems");
 				_instance = found.FirstOrDefault();
@@ -37,7 +41,8 @@ namespace ScriptableSystems {
 				_instance?.Awake();
 #endif
 			}
-			if (_instance == null) {
+			if (_instance == null)
+			{
 				Debug.LogWarning("ScriptableObjectSingleton: Failed to find a ScriptableObject asset of type ScriptableSystemsManager, creating a temporary runtime-only instance.");
 				_instance = CreateInstance<ScriptableSystemsManager>();
 #if UNITY_EDITOR
@@ -47,11 +52,13 @@ namespace ScriptableSystems {
 
 		}
 
-		public T Get<T>() where T : ScriptableSystem {
+		public T Get<T>() where T : ScriptableSystem
+		{
 			return currentSystemsCollection?.Get<T>();
 		}
 
-		public void Awake() {
+		public void Awake()
+		{
 			currentSystemsCollection?.Awake();
 			SceneManager.sceneLoaded -= OnSceneLoaded;
 			SceneManager.sceneLoaded += OnSceneLoaded;
@@ -66,12 +73,15 @@ namespace ScriptableSystems {
 #endif
 		}
 
-		public void OnSceneUnloaded(Scene scene) {
+		public void OnSceneUnloaded(Scene scene)
+		{
 			currentSystemsCollection?.OnSceneUnloaded(scene);
 		}
 #if UNITY_EDITOR
-		public void OnEditorSceneOpened(Scene scene, OpenSceneMode openSceneMode) {
-			switch (openSceneMode) {
+		public void OnEditorSceneOpened(Scene scene, OpenSceneMode openSceneMode)
+		{
+			switch (openSceneMode)
+			{
 				case OpenSceneMode.Single:
 					OnSceneLoaded(scene, LoadSceneMode.Single);
 					break;
@@ -82,12 +92,18 @@ namespace ScriptableSystems {
 			}
 		}
 #endif
-		public void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode) {
+		public void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+		{
 			currentSystemsCollection?.OnSceneLoaded(scene, loadSceneMode);
 		}
 
-		public void Update() {
+		public void Update()
+		{
 			currentSystemsCollection?.Update();
+		}
+		public void FixedUpdate()
+		{
+			currentSystemsCollection?.FixedUpdate();
 		}
 	}
 }

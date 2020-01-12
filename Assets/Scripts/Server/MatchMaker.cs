@@ -164,10 +164,12 @@ namespace BattleBlast
 		#endregion
 
 		#region Tear down
-		public void Dispose()
+		public override void Dispose()
 		{
 			CancelAllQueuedPlayers();
 			queue.Clear();
+
+			base.Dispose();
 		}
 		private void CancelAllQueuedPlayers()
 		{

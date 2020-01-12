@@ -1,4 +1,5 @@
 ﻿using System;
+using Utils;
 
 namespace Networking
 {
@@ -33,6 +34,11 @@ namespace Networking
 		public byte[] SerializeToByteArray()
 		{
 			return Utils.ObjectSerializationExtension.SerializeToByteArray(this);
+		}
+
+		public T GetDataAs<T>()
+		{
+			return (T)serializedData.Deserialize();
 		}
 	}
 }

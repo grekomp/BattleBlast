@@ -13,12 +13,12 @@ namespace BattleBlast
 	{
 		public NetClient client;
 
-		protected Action<string> testDataEventHandler;
+		protected Action<System.String> testDataEventHandler;
 
 		[ContextMenu("Register test data event handler")]
 		public void RegisterTestDataEventHandler()
 		{
-			testDataEventHandler = (string s) => Log.D(s);
+			testDataEventHandler = (System.String s) => Log.D(s);
 			NetClient.Instance.DataEventManager.RegisterHandler(testDataEventHandler);
 		}
 		[ContextMenu("Deregister test data event handler")]
