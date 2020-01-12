@@ -44,13 +44,17 @@ namespace Networking
 		[ContextMenu(nameof(StartServer))]
 		public void StartServer()
 		{
+			Log.Info(LogTag, "Starting server...", this);
 			Initialize();
 			NetCore.Instance.StartBroadcastDiscovery(host.Port);
+			Log.Info(LogTag, $"Server started on HostId: {host.Id}, Port: {host.Port}.", this);
 		}
 		[ContextMenu(nameof(StopServer))]
 		public void StopServer()
 		{
+			Log.Info(LogTag, "Stopping server...", this);
 			NetCore.Instance.StopBroadcastDiscovery();
+			Log.Info(LogTag, "Server stopped.", this);
 		}
 		#endregion
 

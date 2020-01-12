@@ -122,7 +122,7 @@ namespace Networking
 			// Connect to the found server
 			if (task.Status == TaskStatus.RanToCompletion)
 			{
-				NetConnection result = await host.ConnectWithConfirmation(broadcastData.senderAddress, broadcastData.senderPort);
+				NetConnection result = await host.ConnectWithConfirmation(broadcastData.senderAddress, broadcastData.broadcastMessagePort);
 				if (result != null)
 				{
 					state = ClientState.Connected;
