@@ -165,10 +165,10 @@ namespace Networking
 		}
 		protected void HandleDataEvent(int receivedHostId, int receivedConnectionId, byte[] buffer)
 		{
-			NetworkingDataPackage receivedDataPackage = NetworkingDataPackage.DeserializeFrom(receivedConnectionId, buffer);
+			NetDataPackage receivedDataPackage = NetDataPackage.DeserializeFrom(receivedConnectionId, buffer);
 
 			NetHost host = GetHost(receivedHostId);
-			NetworkingReceivedData receivedData = new NetworkingReceivedData(host.GetConnection(receivedConnectionId), receivedDataPackage);
+			NetReceivedData receivedData = new NetReceivedData(host.GetConnection(receivedConnectionId), receivedDataPackage);
 
 			host.HandleDataEvent(receivedData);
 			OnDataReceivedEvent?.Raise(this, receivedData);
@@ -181,7 +181,7 @@ namespace Networking
 			if (broadcastError == (int)NetworkError.Ok && error == (int)NetworkError.Ok)
 			{
 
-				NetworkingDataPackage networkingDataPackage = NetworkingDataPackage.DeserializeFrom(receivedConnectionId, broadcastConnectionMessageBuffer);
+				NetDataPackage networkingDataPackage = NetDataPackage.DeserializeFrom(receivedConnectionId, broadcastConnectionMessageBuffer);
 
 				NetHost host = GetHost(receivedHostId);
 				int broadcastMessagePort = networkingDataPackage.GetDataAs<int>();
@@ -264,7 +264,7 @@ namespace Networking
 
 			broadcastHost = AddHost();
 
-			byte[] buffer = NetworkingDataPackage.CreateFrom(portNumberToBroadcast).SerializeToByteArray();
+			byte[] buffer = NetDataPackage.CreateFrom(portNumberToBroadcast).SerializeToByteArray();
 			NetworkTransport.StartBroadcastDiscovery(broadcastHost.Id, options.broadcastPort, options.broadcastKey, options.broadcastVersion, options.broadcastSubversion, buffer, buffer.Length, 1000, out byte error);
 
 			NetworkError networkError = (NetworkError)error;

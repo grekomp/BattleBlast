@@ -63,7 +63,7 @@ namespace Networking
 		public GameEventHandler OnConnectEvent;
 		public GameEventHandler OnDisconnectEvent;
 
-		public void HandleDataEvent(NetworkingReceivedData receivedData) => OnDataEvent?.Raise(this, receivedData);
+		public void HandleDataEvent(NetReceivedData receivedData) => OnDataEvent?.Raise(this, receivedData);
 		public void HandleConnectEvent() => OnConnectEvent?.Raise(this);
 		public void HandleDisconnectEvent() => OnDisconnectEvent?.Raise(this);
 		#endregion

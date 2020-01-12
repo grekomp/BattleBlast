@@ -10,39 +10,36 @@ namespace Networking
 	{
 		public class RegisteredDataHandler
 		{
-			public object registeredAction;
+			public Action<NetReceivedData> registeredAction;
 			public Type registeredType;
 
-			protected Action<object> handlerDelegate = null;
-
-			public static RegisteredDataHandler New<T>(Action<T> action)
+			public static RegisteredDataHandler New<T>(Action<NetReceivedData> action)
 			{
 				RegisteredDataHandler registeredDataHandler = new RegisteredDataHandler();
 				registeredDataHandler.registeredAction = action;
 				registeredDataHandler.registeredType = typeof(T);
-				registeredDataHandler.handlerDelegate = (dataObject) => action((T)dataObject);
 
 				return registeredDataHandler;
 			}
 
-			public bool IsValidHandlerFor(NetworkingReceivedData receivedData)
+			public bool IsValidHandlerFor(NetReceivedData receivedData)
 			{
 				return registeredType.IsAssignableFrom(receivedData.dataType);
 			}
-			public void ExecuteHandler(NetworkingReceivedData receivedData)
+			public void ExecuteHandler(NetReceivedData receivedData)
 			{
-				handlerDelegate.Invoke(receivedData.data);
+				registeredAction(receivedData);
 			}
 		}
 
 		protected List<RegisteredDataHandler> registeredDataHandlers = new List<RegisteredDataHandler>();
 
 		#region Managing handlers
-		public void RegisterHandler<T>(Action<T> action)
+		public void RegisterHandler<T>(Action<NetReceivedData> action)
 		{
-			registeredDataHandlers.Add(RegisteredDataHandler.New(action));
+			registeredDataHandlers.Add(RegisteredDataHandler.New<T>(action));
 		}
-		public void DeregisterHandler<T>(Action<T> action)
+		public void DeregisterHandler(Action<NetReceivedData> action)
 		{
 			var registeredDataHandler = registeredDataHandlers.Find(dh => action.Equals(dh.registeredAction));
 			if (registeredDataHandler != null)
@@ -55,9 +52,9 @@ namespace Networking
 		#region Handling data events
 		public void HandleDataGameEvent(GameEventData gameEventData)
 		{
-			if (gameEventData.data is NetworkingReceivedData receivedData) HandleDataEvent(receivedData);
+			if (gameEventData.data is NetReceivedData receivedData) HandleDataEvent(receivedData);
 		}
-		public void HandleDataEvent(NetworkingReceivedData receivedData)
+		public void HandleDataEvent(NetReceivedData receivedData)
 		{
 			List<RegisteredDataHandler> validHandlersForDataType = registeredDataHandlers.FindAll(dh => dh.IsValidHandlerFor(receivedData)).ToList();
 			foreach (var handler in validHandlersForDataType)

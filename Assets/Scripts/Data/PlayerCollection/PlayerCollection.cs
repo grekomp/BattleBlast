@@ -17,7 +17,7 @@ namespace BattleBlast
 
 			foreach (var playerCollectionUnit in playerCollectionUnits)
 			{
-				var unitData = Server.Database.GetUnitData(playerCollectionUnit.unitId);
+				var unitData = BBServer.Database.GetUnitData(playerCollectionUnit.unitId);
 				if (unitData != null)
 				{
 

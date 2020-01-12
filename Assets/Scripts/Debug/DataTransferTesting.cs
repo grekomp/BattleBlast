@@ -21,13 +21,13 @@ namespace BattleBlast
 		[ContextMenu(nameof(SendTestString))]
 		public void SendTestString()
 		{
-			NetworkingDataPackage networkingDataPackage = NetworkingDataPackage.CreateFrom(testMessage);
+			NetDataPackage networkingDataPackage = NetDataPackage.CreateFrom(testMessage);
 			NetCore.Instance.Send(hostId, connectionId, Channel.ReliableSequenced, networkingDataPackage.SerializeToByteArray());
 		}
 		[ContextMenu(nameof(SendTestObject))]
 		public void SendTestObject()
 		{
-			NetworkingDataPackage networkingDataPackage = NetworkingDataPackage.CreateFrom(testObject);
+			NetDataPackage networkingDataPackage = NetDataPackage.CreateFrom(testObject);
 			NetCore.Instance.Send(hostId, connectionId, Channel.ReliableSequenced, networkingDataPackage.SerializeToByteArray());
 		}
 	}

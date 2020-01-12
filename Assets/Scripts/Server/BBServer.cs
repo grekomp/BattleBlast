@@ -11,7 +11,7 @@ namespace BattleBlast
 	/// Gives access to all major server-side functions
 	/// </summary>
 	[CreateAssetMenu(menuName = "BattleBlast/Server")]
-	public class Server : ScriptableSystem<Server>
+	public class BBServer : ScriptableSystem<BBServer>
 	{
 		[SerializeField]
 		protected Database database;

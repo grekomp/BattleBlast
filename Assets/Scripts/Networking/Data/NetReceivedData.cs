@@ -7,20 +7,20 @@ using Utils;
 
 namespace Networking
 {
-	public class NetworkingReceivedData
+	public class NetReceivedData
 	{
 		public NetConnection connection;
 		public Type dataType;
 		public object data;
 
 
-		public NetworkingReceivedData(NetConnection connection, Type dataType, object data)
+		public NetReceivedData(NetConnection connection, Type dataType, object data)
 		{
 			this.connection = connection;
 			this.dataType = data.GetType();
 			this.data = data;
 		}
-		public NetworkingReceivedData(NetConnection connection, NetworkingDataPackage dataPackage)
+		public NetReceivedData(NetConnection connection, NetDataPackage dataPackage)
 		{
 			this.connection = connection;
 			dataType = Type.GetType(dataPackage.dataType);

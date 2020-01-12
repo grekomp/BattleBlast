@@ -173,7 +173,7 @@ namespace Networking
 		{
 			if (IsConnected == false) return false;
 
-			var dataPackage = NetworkingDataPackage.CreateFrom(serializableData);
+			var dataPackage = NetDataPackage.CreateFrom(serializableData);
 			var error = host.Send(channel, dataPackage.SerializeToByteArray());
 
 			if (error == UnityEngine.Networking.NetworkError.Ok)
@@ -202,7 +202,7 @@ namespace Networking
 		}
 		protected void HandleDataReceived(GameEventData gameEventData)
 		{
-			if (gameEventData.data is NetworkingReceivedData receivedData)
+			if (gameEventData.data is NetReceivedData receivedData)
 			{
 				dataEventManager.HandleDataEvent(receivedData);
 				OnDataReceived?.Raise(this, receivedData);

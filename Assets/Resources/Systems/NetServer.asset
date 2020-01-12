@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62c1245cd662bc848b39c3e794438cbe, type: 3}
+  m_Script: {fileID: 11500000, guid: b078b6c38faf4c046bfe624196956ba5, type: 3}
   m_Name: NetServer
   m_EditorClassIdentifier: 
   settings:
-    initializeOnAwake: 1
+    initializeOnAwake: 0
     disposeOnDisable: 1
     playModeOnly: 1
   host: {fileID: 0}

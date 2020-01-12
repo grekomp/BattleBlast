@@ -134,7 +134,7 @@ namespace BattleBlast
 
 		private Battle CreateNewBattle(PlayerData player1, PlayerData player2, BattleCreationData battleCreationData)
 		{
-			return Server.BattleManager.CreateBattleFor(player1, player2, battleCreationData);
+			return BBServer.BattleManager.CreateBattleFor(player1, player2, battleCreationData);
 		}
 		#endregion
 

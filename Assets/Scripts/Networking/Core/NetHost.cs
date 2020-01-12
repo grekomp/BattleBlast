@@ -66,7 +66,7 @@ namespace Networking
 		public GameEventHandler OnDisconnectEvent = new GameEventHandler();
 		public GameEventHandler OnBroadcastEvent = new GameEventHandler();
 
-		public void HandleDataEvent(NetworkingReceivedData receivedData)
+		public void HandleDataEvent(NetReceivedData receivedData)
 		{
 			receivedData.connection.HandleDataEvent(receivedData);
 			OnDataEvent?.Raise(this, receivedData);

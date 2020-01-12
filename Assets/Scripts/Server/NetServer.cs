@@ -1,4 +1,5 @@
-﻿using ScriptableSystems;
+﻿using Networking;
+using ScriptableSystems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Utils;
 
-namespace Networking
+namespace BattleBlast.Server
 {
 	[CreateAssetMenu(menuName = "BattleBlast/Networking/NetServer")]
 	public class NetServer : ScriptableSystem<NetServer>
@@ -18,6 +19,7 @@ namespace Networking
 		public NetHost host;
 
 		protected NetDataEventManager dataEventManager = new NetDataEventManager();
+		protected ServerClientManager serverClientManager = new ServerClientManager();
 
 
 		#region Public properties
@@ -58,11 +60,6 @@ namespace Networking
 		#endregion
 
 
-		#region Clients
-
-		#endregion
-
-
 		#region Handling Data
 		/// <summary>
 		/// Sends provided serializableData object to the client.
@@ -73,7 +70,7 @@ namespace Networking
 		{
 			if (connection.ConnectionConfirmed == false) return false;
 
-			var dataPackage = NetworkingDataPackage.CreateFrom(serializableData);
+			var dataPackage = NetDataPackage.CreateFrom(serializableData);
 			var error = connection.Send(channel, dataPackage.SerializeToByteArray());
 
 			if (error == UnityEngine.Networking.NetworkError.Ok)
@@ -97,7 +94,7 @@ namespace Networking
 		}
 		protected void HandleDataReceived(GameEventData gameEventData)
 		{
-			if (gameEventData.data is NetworkingReceivedData receivedData)
+			if (gameEventData.data is NetReceivedData receivedData)
 			{
 				dataEventManager.HandleDataEvent(receivedData);
 				OnDataReceived?.Raise(this, receivedData);
@@ -130,8 +127,6 @@ namespace Networking
 		#region Cleanup
 		public override void Dispose()
 		{
-			Log.D(LogTag, "Dispose", this);
-
 			if (NetCore.InstanceExists == false) return;
 
 			NetCore.Instance.RemoveHost(host);
