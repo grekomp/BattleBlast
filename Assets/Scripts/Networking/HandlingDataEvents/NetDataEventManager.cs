@@ -34,6 +34,13 @@ namespace Networking
 
 		protected List<RegisteredDataHandler> registeredDataHandlers = new List<RegisteredDataHandler>();
 
+		#region Initialization
+		public void Initialize(NetHost host)
+		{
+			host.OnDataEvent.RegisterListener(HandleDataGameEvent);
+		}
+		#endregion
+
 		#region Managing handlers
 		public void RegisterHandler<T>(Action<NetReceivedData> action)
 		{

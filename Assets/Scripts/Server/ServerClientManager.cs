@@ -33,10 +33,28 @@ namespace BattleBlast.Server
 		#endregion
 
 		#region Authentication
-		public void HandleAuthenticationRequest(Credentials credentials)
+		public void HandleAuthenticationRequest(NetReceivedData receivedData)
 		{
-
+			if (receivedData.data is Credentials credentials)
+			{
+				if (TryAuthenticateClient(receivedData.connection, credentials, out ConnectedClient connectedClient))
+				{
+					RemoveUnauthenticatedClient(connectedClient.Connection);
+					AddConnectedClient(connectedClient);
+					// TODO: Send authentication confirmed
+				}
+				else
+				{
+					// TODO: Send authentication failed
+				}
+			}
 		}
+
+		private void AddConnectedClient(ConnectedClient connectedClient)
+		{
+			throw new NotImplementedException();
+		}
+
 		public bool TryAuthenticateClient(NetConnection connection, Credentials credentials, out ConnectedClient connectedClient)
 		{
 			bool authenticationResult = Authenticator.TryAuthenticatePlayer(credentials, out PlayerData playerData, out string authToken);
