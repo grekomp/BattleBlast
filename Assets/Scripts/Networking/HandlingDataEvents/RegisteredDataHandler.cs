@@ -18,6 +18,7 @@ namespace Networking
 		{
 			DataHandler registeredDataHandler = new DataHandler();
 			registeredDataHandler.registeredAction = action;
+			registeredDataHandler.dataFilter = dataFilter;
 			registeredDataHandler.isOneShotHandler = isOneShotHandler;
 
 			return registeredDataHandler;
