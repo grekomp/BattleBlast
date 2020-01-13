@@ -200,7 +200,6 @@ namespace Networking
 		{
 			if (gameEventData.data is NetReceivedData receivedData)
 			{
-				NetDataEventManager.Instance.HandleDataEvent(receivedData);
 				OnDataReceived?.Raise(this, receivedData);
 			}
 		}
