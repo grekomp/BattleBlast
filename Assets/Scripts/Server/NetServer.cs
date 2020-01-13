@@ -18,13 +18,8 @@ namespace BattleBlast.Server
 		[Header("Runtime Variables")]
 		public NetHost host;
 
-		protected NetDataEventManager dataEventManager = new NetDataEventManager();
 		protected ServerClientManager serverClientManager = new ServerClientManager();
 
-
-		#region Public properties
-		public NetDataEventManager DataEventManager { get => dataEventManager; }
-		#endregion
 
 
 		#region Initialization
@@ -96,7 +91,6 @@ namespace BattleBlast.Server
 		{
 			if (gameEventData.data is NetReceivedData receivedData)
 			{
-				dataEventManager.HandleDataEvent(receivedData);
 				OnDataReceived?.Raise(this, receivedData);
 			}
 		}

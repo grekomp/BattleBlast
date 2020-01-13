@@ -167,10 +167,11 @@ namespace Networking
 		{
 			NetDataPackage receivedDataPackage = NetDataPackage.DeserializeFrom(receivedConnectionId, buffer);
 
-			NetHost host = GetHost(receivedHostId);
-			NetReceivedData receivedData = new NetReceivedData(host.GetConnection(receivedConnectionId), receivedDataPackage);
+			NetConnection connection = GetHost(receivedHostId).GetConnection(receivedConnectionId);
+			NetReceivedData receivedData = new NetReceivedData(connection, receivedDataPackage);
 
-			host.HandleDataEvent(receivedData);
+			NetDataEventManager.Instance.HandleDataEvent(receivedData);
+
 			OnDataReceivedEvent?.Raise(this, receivedData);
 		}
 		protected void HandleBroadcastEvent(int receivedHostId, int receivedConnectionId, byte[] buffer)

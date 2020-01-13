@@ -9,10 +9,10 @@ namespace Networking
 {
 	public class NetReceivedData
 	{
+		public string id;
 		public NetConnection connection;
 		public Type dataType;
 		public object data;
-
 
 		public NetReceivedData(NetConnection connection, Type dataType, object data)
 		{

@@ -11,18 +11,18 @@ namespace BattleBlast.Server
 {
 	public class ServerTesting : MonoBehaviour
 	{
-		protected Action<NetReceivedData> testDataEventHandler;
+		protected DataHandler dataHandler;
 
 		[ContextMenu("Register test data event handler")]
 		public void RegisterTestDataEventHandler()
 		{
-			testDataEventHandler = (NetReceivedData receivedData) => Log.D(receivedData.data);
-			NetServer.Instance.DataEventManager.RegisterHandler<System.String>(testDataEventHandler);
+			dataHandler = DataHandler.New((NetReceivedData receivedData) => Log.D(receivedData.data), new NetDataFilterAny());
+			NetDataEventManager.Instance.RegisterHandler(dataHandler);
 		}
 		[ContextMenu("Deregister test data event handler")]
 		public void DeregisterTestDataEventHandler()
 		{
-			NetServer.Instance.DataEventManager.DeregisterHandler(testDataEventHandler);
+			NetDataEventManager.Instance.DeregisterHandler(dataHandler);
 		}
 	}
 }

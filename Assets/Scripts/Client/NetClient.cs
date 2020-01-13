@@ -39,13 +39,9 @@ namespace Networking
 		public NetHost host;
 
 
-		protected NetDataEventManager dataEventManager = new NetDataEventManager();
-
-
 		#region Public properties
 		public ClientState State { get => state; set => state = value; }
 		public bool IsConnected { get => host.Connections.Count > 0; }
-		public NetDataEventManager DataEventManager { get => dataEventManager; }
 		#endregion
 
 
@@ -204,7 +200,7 @@ namespace Networking
 		{
 			if (gameEventData.data is NetReceivedData receivedData)
 			{
-				dataEventManager.HandleDataEvent(receivedData);
+				NetDataEventManager.Instance.HandleDataEvent(receivedData);
 				OnDataReceived?.Raise(this, receivedData);
 			}
 		}
