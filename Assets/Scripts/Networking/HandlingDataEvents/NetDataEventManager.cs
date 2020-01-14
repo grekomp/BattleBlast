@@ -35,10 +35,16 @@ namespace Networking
 		public void HandleDataEvent(NetReceivedData receivedData)
 		{
 			List<DataHandler> validHandlersForDataType = registeredDataHandlers.FindAll(dh => dh.IsValidHandlerFor(receivedData)).ToList();
+
 			foreach (var handler in validHandlersForDataType)
 			{
 				handler.ExecuteHandler(receivedData);
 				if (handler.IsOneShotHandler) DeregisterHandler(handler);
+			}
+
+			if (receivedData.responseRequired && receivedData.responseSent == false)
+			{
+				receivedData.SendResponse(new NullResponseData());
 			}
 		}
 		#endregion

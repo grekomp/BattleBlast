@@ -16,6 +16,11 @@ MonoBehaviour:
     initializeOnAwake: 0
     disposeOnDisable: 1
     playModeOnly: 1
+  systems:
+    database: {fileID: 11400000, guid: 98aae8ec1f0af2544837980f2617d427, type: 2}
+    matchMaker: {fileID: 11400000, guid: 28377793780d95e4e8f1a36e8920e583, type: 2}
+    battleManager: {fileID: 11400000, guid: 046ebfe3f10277d488a5de80f562080a, type: 2}
+    clientManager: {fileID: 11400000, guid: 7b059ea0cc9339d449a1cbec22c826cc, type: 2}
   host: {fileID: 0}
   OnConnect:
     inspectedEvent: {fileID: 0}

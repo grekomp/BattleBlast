@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BattleBlast.Server;
+using System;
 using System.Collections.Generic;
 
 namespace BattleBlast
@@ -17,11 +18,7 @@ namespace BattleBlast
 
 			foreach (var playerCollectionUnit in playerCollectionUnits)
 			{
-				var unitData = BBServer.Database.GetUnitData(playerCollectionUnit.unitId);
-				if (unitData != null)
-				{
-
-				}
+				//
 			}
 
 			return result;

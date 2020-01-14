@@ -1,4 +1,5 @@
 ﻿using Networking;
+using ScriptableSystems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,18 +9,44 @@ using UnityEngine;
 
 namespace BattleBlast.Server
 {
-	public class ServerClientManager
+	[CreateAssetMenu(menuName = "BattleBlast/Systems/ServerClientManager")]
+	public class ServerClientManager : ScriptableSystem
 	{
 		[SerializeField] protected List<NetConnection> unauthenticatedClientConnections = new List<NetConnection>();
+		[SerializeField] protected List<ConnectedClient> connectedClients = new List<ConnectedClient>();
+
+		protected DataHandler dataHandler;
 
 		#region Initialization
-		public void Initialize()
+		protected override void OnInitialize()
 		{
+			base.OnInitialize();
 
+			dataHandler = DataHandler.New(HandleAuthenticationRequest, new NetDataFilterType(typeof(Credentials)));
+
+			NetServer.Instance.host.OnConnectEvent.RegisterListenerOnce(HandleConnectGameEvent);
+			NetDataEventManager.Instance.RegisterHandler(dataHandler);
 		}
 		#endregion
 
-		#region Unauthenticated clients
+		#region Handling events
+		public void HandleConnectGameEvent(GameEventData gameEventData)
+		{
+			if (gameEventData.data is NetConnection connection)
+			{
+				AddUnauthenticatedClient(connection);
+			}
+		}
+		public void HandleDisconnectGameEvent(GameEventData gameEventData)
+		{
+			if (gameEventData.data is NetConnection connection)
+			{
+				ClientDisconnected(connection);
+			}
+		}
+		#endregion
+
+		#region Managing clients
 		public void AddUnauthenticatedClient(NetConnection connection)
 		{
 			unauthenticatedClientConnections.Add(connection);
@@ -30,6 +57,23 @@ namespace BattleBlast.Server
 		{
 			unauthenticatedClientConnections.Remove(connection);
 		}
+		public void ClientDisconnected(NetConnection connection)
+		{
+			if (unauthenticatedClientConnections.Contains(connection)) RemoveUnauthenticatedClient(connection);
+
+			var connectedClient = connectedClients.Find(c => c.Connection.Equals(connection));
+			if (connectedClient != null) RemoveConnectedClient(connectedClient);
+		}
+
+		protected void AddConnectedClient(ConnectedClient connectedClient)
+		{
+			connectedClients.Add(connectedClient);
+		}
+		public void RemoveConnectedClient(ConnectedClient client)
+		{
+			connectedClients.Remove(client);
+		}
+
 		#endregion
 
 		#region Authentication
@@ -41,18 +85,13 @@ namespace BattleBlast.Server
 				{
 					RemoveUnauthenticatedClient(connectedClient.Connection);
 					AddConnectedClient(connectedClient);
-					// TODO: Send authentication confirmed
+					receivedData.SendResponse(new AuthenticationResult(true, connectedClient.AuthToken, connectedClient.PlayerData.id));
 				}
 				else
 				{
-					// TODO: Send authentication failed
+					receivedData.SendResponse(new AuthenticationResult(false, null, null));
 				}
 			}
-		}
-
-		private void AddConnectedClient(ConnectedClient connectedClient)
-		{
-			throw new NotImplementedException();
 		}
 
 		public bool TryAuthenticateClient(NetConnection connection, Credentials credentials, out ConnectedClient connectedClient)
@@ -70,7 +109,5 @@ namespace BattleBlast.Server
 			}
 		}
 		#endregion
-
-
 	}
 }

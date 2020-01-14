@@ -9,9 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad4efda722325624ba9dd2d8cb80a348, type: 3}
-  m_Name: ScriptableSystemsCollection
+  m_Script: {fileID: 11500000, guid: 01bee251b8878724aa55da76a4b18d7f, type: 3}
+  m_Name: Server Client Manager
   m_EditorClassIdentifier: 
-  systems:
-  - {fileID: 11400000, guid: de8c64e4acc792042b333e816d2d55b6, type: 2}
-  - {fileID: 11400000, guid: 7b059ea0cc9339d449a1cbec22c826cc, type: 2}
+  settings:
+    initializeOnAwake: 0
+    disposeOnDisable: 1
+    playModeOnly: 1
+  unauthenticatedClientConnections: []

@@ -35,5 +35,15 @@ namespace BattleBlast
 		{
 			return playerDataCollection.Find(p => p.username == username);
 		}
+
+		public void Initialize()
+		{
+			//throw new NotImplementedException();
+		}
+
+		public void Dispose()
+		{
+			//throw new NotImplementedException();
+		}
 	}
 }

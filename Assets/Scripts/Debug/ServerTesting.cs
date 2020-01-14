@@ -19,6 +19,16 @@ namespace BattleBlast.Server
 			dataHandler = DataHandler.New((NetReceivedData receivedData) => Log.D(receivedData.data), new NetDataFilterAny());
 			NetDataEventManager.Instance.RegisterHandler(dataHandler);
 		}
+		[ContextMenu("Register test request handler")]
+		public void RegisterTestRequestHandler()
+		{
+			dataHandler = DataHandler.New((NetReceivedData receivedData) =>
+			{
+				Log.D(receivedData.data);
+				if (receivedData.responseRequired) receivedData.SendResponse("This is a correct response");
+			}, new NetDataFilterAny());
+			NetDataEventManager.Instance.RegisterHandler(dataHandler);
+		}
 		[ContextMenu("Deregister test data event handler")]
 		public void DeregisterTestDataEventHandler()
 		{

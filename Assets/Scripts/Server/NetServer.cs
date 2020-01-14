@@ -15,17 +15,28 @@ namespace BattleBlast.Server
 	{
 		private static readonly string LogTag = nameof(NetServer);
 
+		[Header("Server options")]
+		[SerializeField] private ServerSystems systems = new ServerSystems();
+
+
 		[Header("Runtime Variables")]
 		public NetHost host;
 
-		protected ServerClientManager serverClientManager = new ServerClientManager();
 
+		#region Public properties
+		public ServerSystems Systems => systems;
+		#endregion
 
 
 		#region Initialization
 		protected override void OnInitialize()
 		{
+			base.OnInitialize();
+
 			host = NetCore.Instance.AddHost();
+
+			// Initialize systems
+			systems.Initialize();
 
 			// Register event listeners
 			host.OnConnectEvent.RegisterListenerOnce(HandleConnect);
@@ -55,29 +66,6 @@ namespace BattleBlast.Server
 		#endregion
 
 
-		#region Handling Data
-		/// <summary>
-		/// Sends provided serializableData object to the client.
-		/// </summary>
-		/// <param name="serializableData">Data object to send. Must be a serializable class.</param>
-		/// <returns>Whether the operation succeeded.</returns>
-		public bool SendData(NetConnection connection, object serializableData, int channel = Channel.ReliableSequenced)
-		{
-			if (connection.ConnectionConfirmed == false) return false;
-
-			var dataPackage = NetDataPackage.CreateFrom(serializableData);
-			var error = connection.Send(channel, dataPackage.SerializeToByteArray());
-
-			if (error == UnityEngine.Networking.NetworkError.Ok)
-			{
-				OnDataSent?.Raise(this, serializableData);
-			}
-
-			return error == UnityEngine.Networking.NetworkError.Ok;
-		}
-		#endregion
-
-
 		#region Handling Events
 		protected void HandleConnect()
 		{
@@ -100,15 +88,7 @@ namespace BattleBlast.Server
 		}
 		protected void HandleBroadcastEvent(GameEventData gameEventData)
 		{
-			//if (state != ClientState.LookingForServer) return;
 
-			//if (gameEventData.data is ReceivedBroadcastData receivedBroadcastData)
-			//{
-			//	if (broadcastEventReceivedTaskCompletionSource != null)
-			//	{
-			//		broadcastEventReceivedTaskCompletionSource.TrySetResult(receivedBroadcastData);
-			//	}
-			//}
 		}
 
 		[Header("Events")]
@@ -116,6 +96,7 @@ namespace BattleBlast.Server
 		public GameEventHandler OnDisconnect;
 		public GameEventHandler OnDataReceived;
 		public GameEventHandler OnDataSent;
+
 		#endregion
 
 		#region Cleanup
@@ -124,6 +105,8 @@ namespace BattleBlast.Server
 			if (NetCore.InstanceExists == false) return;
 
 			NetCore.Instance.RemoveHost(host);
+
+			systems.Dispose();
 
 			// Deregister event listeners
 			NetCore.Instance.OnConnectEvent.DeregisterListener(HandleConnect);

@@ -12,19 +12,24 @@ namespace Networking
 		public string id = Guid.NewGuid().ToString();
 		public string dataType;
 		public byte[] serializedData;
+		public bool responseRequired = false;
 
-		public NetDataPackage(string id, string dataType, byte[] serializedData)
+
+		#region Creation
+		public NetDataPackage(string id, string dataType, byte[] serializedData, bool responseRequired = false)
 		{
 			this.id = id;
 			this.dataType = dataType;
 			this.serializedData = serializedData;
+			this.responseRequired = responseRequired;
 		}
-		public NetDataPackage(string dataType, byte[] serializedData)
+		public NetDataPackage(string dataType, byte[] serializedData, bool responseRequired = false)
 		{
 			this.dataType = dataType;
 			this.serializedData = serializedData;
+			this.responseRequired = responseRequired;
 		}
-		public static NetDataPackage CreateFrom(object serializableData, string id = null)
+		public static NetDataPackage CreateFrom(object serializableData, string id = null, bool responseRequired = false)
 		{
 			if (serializableData.GetType().IsSerializable == false)
 				throw new ArgumentException($"{nameof(NetDataPackage)}: Error: Cannot create data package from {serializableData}, as it is not serializable.");
@@ -33,22 +38,28 @@ namespace Networking
 			byte[] serializedData = Utils.ObjectSerializationExtension.SerializeToByteArray(serializableData);
 			if (id == null) id = Guid.NewGuid().ToString();
 
-			return new NetDataPackage(id, dataType, serializedData);
+			return new NetDataPackage(id, dataType, serializedData, responseRequired);
 		}
+		#endregion
 
-		public static NetDataPackage DeserializeFrom(int receivedConnectionId, byte[] serializedData)
-		{
-			return Utils.ObjectSerializationExtension.Deserialize<NetDataPackage>(serializedData);
-		}
 
+		#region Serialization
 		public byte[] SerializeToByteArray()
 		{
 			return Utils.ObjectSerializationExtension.SerializeToByteArray(this);
 		}
+		public static NetDataPackage DeserializeFrom(byte[] serializedData)
+		{
+			return Utils.ObjectSerializationExtension.Deserialize<NetDataPackage>(serializedData);
+		}
+		#endregion
 
+
+		#region Data retrieval
 		public T GetDataAs<T>()
 		{
 			return (T)serializedData.Deserialize();
 		}
+		#endregion
 	}
 }

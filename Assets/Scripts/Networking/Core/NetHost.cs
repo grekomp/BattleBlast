@@ -41,25 +41,6 @@ namespace Networking
 		}
 		#endregion
 
-		#region Sending data
-		/// <summary>
-		/// Sends data to the first available connection
-		/// </summary>
-		public virtual NetworkError Send(int channel, byte[] data)
-		{
-			if (IsActive == false) return NetworkError.WrongHost;
-
-			NetConnection connection = connections.First();
-			if (connection == null)
-			{
-				Log.Warning(LogTag, $"Cannot send data - no connections available.");
-				return NetworkError.WrongOperation;
-			}
-
-			return connection.Send(channel, data);
-		}
-		#endregion
-
 		#region Handling events
 		public GameEventHandler OnDataEvent = new GameEventHandler();
 		public GameEventHandler OnConnectEvent = new GameEventHandler();
@@ -149,7 +130,6 @@ namespace Networking
 		public NetworkError Disconnect(NetConnection connection)
 		{
 			NetworkError error = NetCore.Instance.Disconnect(id, connection.Id);
-			connections.Remove(connection);
 			return error;
 		}
 		#endregion

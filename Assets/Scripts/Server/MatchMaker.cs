@@ -1,4 +1,5 @@
-﻿using ScriptableSystems;
+﻿using BattleBlast.Server;
+using ScriptableSystems;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -134,7 +135,7 @@ namespace BattleBlast
 
 		private Battle CreateNewBattle(PlayerData player1, PlayerData player2, BattleCreationData battleCreationData)
 		{
-			return BBServer.BattleManager.CreateBattleFor(player1, player2, battleCreationData);
+			return NetServer.Instance.Systems.BattleManager.CreateBattleFor(player1, player2, battleCreationData);
 		}
 		#endregion
 

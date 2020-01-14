@@ -1,4 +1,5 @@
-﻿using ScriptableSystems;
+﻿using Networking;
+using ScriptableSystems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Utils;
 
-namespace Networking
+namespace BattleBlast
 {
 	public class NetClient : DontDestroySingleton<NetClient>
 	{
@@ -20,7 +21,8 @@ namespace Networking
 			Uninitialized,
 			NotConnected,
 			LookingForServer,
-			Connected
+			Connected,
+			Authenticated
 		}
 
 		[Serializable]
@@ -36,12 +38,19 @@ namespace Networking
 
 		[Header("Runtime Variables")]
 		[SerializeField] [Disabled] protected ClientState state;
-		public NetHost host;
+		[SerializeField] [Disabled] protected NetHost host;
+		public NetConnection connection;
+
+		[SerializeField] [Disabled] protected string authToken = "";
+		[SerializeField] [Disabled] protected string playerId = "";
 
 
 		#region Public properties
-		public ClientState State { get => state; set => state = value; }
-		public bool IsConnected { get => host.Connections.Count > 0; }
+		public ClientState State => state;
+		public bool IsConnected => connection != null;
+		public string AuthToken => authToken;
+		public string PlayerId => playerId;
+		public NetHost Host => host;
 		#endregion
 
 
@@ -102,6 +111,7 @@ namespace Networking
 			}
 			else
 			{
+				state = ClientState.NotConnected;
 				Log.Info(LogTag, "Failed to connect to server.", this);
 			}
 		}
@@ -117,8 +127,8 @@ namespace Networking
 			// Connect to the found server
 			if (task.Status == TaskStatus.RanToCompletion)
 			{
-				NetConnection result = await host.ConnectWithConfirmation(broadcastData.senderAddress, broadcastData.broadcastMessagePort);
-				if (result != null)
+				connection = await host.ConnectWithConfirmation(broadcastData.senderAddress, broadcastData.broadcastMessagePort);
+				if (connection != null)
 				{
 					state = ClientState.Connected;
 					return true;
@@ -141,8 +151,9 @@ namespace Networking
 		{
 			if (IsConnected == false) return;
 
-			host.Disconnect();
-			OnDisconnect?.Raise(this);
+			Log.Info(LogTag, "Disconnecting from server...", this);
+			connection.Disconnect();
+			Log.Info(LogTag, "Disconnected.", this);
 		}
 
 		private async Task<ReceivedBroadcastData> FindServerBroadcast(CancellationToken cancellationToken)
@@ -152,9 +163,51 @@ namespace Networking
 			NetCore.Instance.StartScanningForBroadcast();
 
 			// Wait for server to be found
-			ReceivedBroadcastData broadcastData = await broadcastEventReceivedTaskCompletionSource.Task;
-			NetCore.Instance.StopScanningForBroadcast();
+			ReceivedBroadcastData broadcastData = null;
+			try
+			{
+				broadcastData = await broadcastEventReceivedTaskCompletionSource.Task;
+			}
+			finally
+			{
+				NetCore.Instance.StopScanningForBroadcast();
+			}
 			return broadcastData;
+		}
+		#endregion
+
+
+		#region MyRegion
+		public async Task<bool> TryAuthenticate(Credentials credentials)
+		{
+			if (IsConnected == false) return false;
+
+			Log.Info(LogTag, $"Attempting to authenticate player. Username: {credentials.username}.");
+			NetReceivedData response = await NetRequest.CreateAndSend(connection, credentials).WaitForResponse();
+
+			if (response.data is AuthenticationResult authenticationResult)
+			{
+				if (authenticationResult.authenticationSuccessfull)
+				{
+					authToken = authenticationResult.authToken;
+					playerId = authenticationResult.playerId;
+
+					state = ClientState.Authenticated;
+
+					Log.Info(LogTag, "Authentication successfull.");
+					return true;
+				}
+				else
+				{
+					Log.Info(LogTag, "Authentication failed.");
+				}
+			}
+			else
+			{
+				Log.Error(LogTag, "Authentication error: Unexpected response type.");
+			}
+
+			return false;
 		}
 		#endregion
 
@@ -169,15 +222,13 @@ namespace Networking
 		{
 			if (IsConnected == false) return false;
 
-			var dataPackage = NetDataPackage.CreateFrom(serializableData);
-			var error = host.Send(channel, dataPackage.SerializeToByteArray());
-
-			if (error == UnityEngine.Networking.NetworkError.Ok)
+			var result = connection.Send(serializableData, channel);
+			if (result == UnityEngine.Networking.NetworkError.Ok)
 			{
 				OnDataSent?.Raise(this, serializableData);
 			}
 
-			return error == UnityEngine.Networking.NetworkError.Ok;
+			return result == UnityEngine.Networking.NetworkError.Ok;
 		}
 		/// <summary>
 		/// Registers a listener to the OnDataReceived event that only gets called if the received data is of type T.
@@ -194,6 +245,7 @@ namespace Networking
 		}
 		protected void HandleDisconnect()
 		{
+			state = ClientState.NotConnected;
 			OnDisconnect?.Raise(this);
 		}
 		protected void HandleDataReceived(GameEventData gameEventData)
@@ -233,6 +285,13 @@ namespace Networking
 		public void SendTestData()
 		{
 			SendData("Test data!");
+		}
+		[ContextMenu(nameof(SendTestRequest))]
+		public async void SendTestRequest()
+		{
+			var request = NetRequest.CreateAndSend(connection, "Test request data");
+			var result = await request.WaitForResponse();
+			Log.D(result.data);
 		}
 		#endregion
 	}

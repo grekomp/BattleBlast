@@ -122,7 +122,6 @@ namespace Networking
 						HandleDisconnectEvent(receivedHostId, receivedConnectionId);
 						break;
 					case NetworkEventType.DataEvent:
-						Log.Verbose(LogTag, $"Received data from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}. \nRaw data: {buffer}.");
 						HandleDataEvent(receivedHostId, receivedConnectionId, buffer);
 						break;
 					case NetworkEventType.BroadcastEvent:
@@ -144,7 +143,7 @@ namespace Networking
 				}
 				else
 				{
-					NetConnection connection = new NetConnection(receivedConnectionId, host);
+					NetConnection connection = NetConnection.New(receivedConnectionId, host);
 					host.AddConnection(connection);
 					connection.ConfirmConnection();
 				}
@@ -158,14 +157,18 @@ namespace Networking
 		{
 			NetHost host = GetHost(receivedHostId);
 			NetConnection connection = host.GetConnection(receivedConnectionId);
-			host.RemoveConnection(receivedConnectionId);
 
 			host.HandleDisconnectEvent(connection);
+			host.RemoveConnection(receivedConnectionId);
+			Utils.Utils.DestroyAnywhere(connection);
+
 			OnDisconnectEvent?.Raise(this, receivedConnectionId);
 		}
 		protected void HandleDataEvent(int receivedHostId, int receivedConnectionId, byte[] buffer)
 		{
-			NetDataPackage receivedDataPackage = NetDataPackage.DeserializeFrom(receivedConnectionId, buffer);
+			NetDataPackage receivedDataPackage = NetDataPackage.DeserializeFrom(buffer);
+
+			Log.Verbose(LogTag, $"Received data from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}. \nDataId: {receivedDataPackage.id}, Data: {receivedDataPackage.GetDataAs<object>()}.");
 
 			NetConnection connection = GetHost(receivedHostId).GetConnection(receivedConnectionId);
 			NetReceivedData receivedData = new NetReceivedData(connection, receivedDataPackage);
@@ -182,7 +185,7 @@ namespace Networking
 			if (broadcastError == (int)NetworkError.Ok && error == (int)NetworkError.Ok)
 			{
 
-				NetDataPackage networkingDataPackage = NetDataPackage.DeserializeFrom(receivedConnectionId, broadcastConnectionMessageBuffer);
+				NetDataPackage networkingDataPackage = NetDataPackage.DeserializeFrom(broadcastConnectionMessageBuffer);
 
 				NetHost host = GetHost(receivedHostId);
 				int broadcastMessagePort = networkingDataPackage.GetDataAs<int>();
@@ -356,7 +359,7 @@ namespace Networking
 			if ((NetworkError)error == NetworkError.Ok)
 			{
 				NetHost netHost = activeHosts.Find(h => h.Id == hostId);
-				NetConnection connection = new NetConnection(connectionId, netHost);
+				NetConnection connection = NetConnection.New(connectionId, netHost);
 				netHost.AddConnection(connection);
 
 				Log.Verbose(LogTag, $"Added new connection, HostId: {hostId}, ConnectionId: {connectionId}.", this);
