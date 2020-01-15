@@ -12,10 +12,16 @@ namespace BattleBlast.Server
 	[CreateAssetMenu(menuName = "BattleBlast/Systems/ServerClientManager")]
 	public class ServerClientManager : ScriptableSystem
 	{
+		public static ServerClientManager Instance => NetServer.Instance.Systems.ClientManager;
+
+
 		[SerializeField] protected List<NetConnection> unauthenticatedClientConnections = new List<NetConnection>();
-		[SerializeField] protected List<ConnectedClient> connectedClients = new List<ConnectedClient>();
+		[SerializeField] private List<ConnectedClient> connectedClients = new List<ConnectedClient>();
 
 		protected DataHandler dataHandler;
+
+		public List<ConnectedClient> ConnectedClients => new List<ConnectedClient>(connectedClients);
+
 
 		#region Initialization
 		protected override void OnInitialize()
@@ -28,6 +34,7 @@ namespace BattleBlast.Server
 			NetDataEventManager.Instance.RegisterHandler(dataHandler);
 		}
 		#endregion
+
 
 		#region Handling events
 		public void HandleConnectGameEvent(GameEventData gameEventData)
@@ -45,6 +52,7 @@ namespace BattleBlast.Server
 			}
 		}
 		#endregion
+
 
 		#region Managing clients
 		public void AddUnauthenticatedClient(NetConnection connection)
@@ -89,7 +97,13 @@ namespace BattleBlast.Server
 			connectedClients.Remove(client);
 		}
 
+
+		public ConnectedClient GetClientForPlayer(PlayerData playerData)
+		{
+			return connectedClients.Find(c => c.PlayerData.Equals(playerData));
+		}
 		#endregion
+
 
 		#region Authentication
 		public void HandleAuthenticationRequest(NetReceivedData receivedData)
