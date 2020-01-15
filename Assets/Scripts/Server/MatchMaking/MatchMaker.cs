@@ -1,10 +1,12 @@
 ﻿using BattleBlast.Server;
+using Networking;
 using ScriptableSystems;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using Utils;
 
 namespace BattleBlast
 {
@@ -73,6 +75,21 @@ namespace BattleBlast
 		public MatchMakerSettings matchMakerSettings;
 		public List<QueuedPlayer> queue = new List<QueuedPlayer>();
 
+
+		protected DataHandler dataHandler;
+
+
+		#region Initialization
+		protected override void OnInitialize()
+		{
+			base.OnInitialize();
+
+			dataHandler = DataHandler.New(HandleMatchMakingRequestDataEvent, new NetDataFilterType(typeof(MatchMakingRequest)));
+			NetDataEventManager.Instance.RegisterHandler(dataHandler);
+		}
+		#endregion
+
+
 		#region Public methods
 		public async Task<MatchMakingResult> FindAMatch(PlayerData player, MatchMakingSettings matchMakingData)
 		{
@@ -107,6 +124,23 @@ namespace BattleBlast
 		}
 		#endregion
 
+
+		#region Handling events
+		public async void HandleMatchMakingRequestDataEvent(NetReceivedData receivedData)
+		{
+			if (receivedData.data is MatchMakingRequest matchMakingRequest)
+			{
+				receivedData.requestHandled = true;
+
+				PlayerData playerData = NetServer.Instance.Systems.Database.GetPlayerDataById(matchMakingRequest.playerId);
+				MatchMakingResult result = await FindAMatch(playerData, matchMakingRequest.matchMakingSettings);
+				Log.D(result);
+				receivedData.SendResponse(result);
+			}
+		}
+		#endregion
+
+
 		#region Matching players
 		private bool TryMatchingWithCurrentQueue(QueuedPlayer newQueueEntry, out MatchMakingResult result)
 		{
@@ -116,7 +150,7 @@ namespace BattleBlast
 			{
 				SetMatchFoundFor(matchingPlayer);
 
-				var battleId = CreateNewBattle(matchingPlayer.player, newQueueEntry.player, new BattleCreationData());
+				var battleId = NetServer.Instance.Systems.BattleManager.CreateBattleFor(matchingPlayer.player, newQueueEntry.player, new BattleCreationData());
 				result = new MatchMakingResult(newQueueEntry.player, matchingPlayer.player, battleId, MatchMakingResult.Status.MatchFound);
 
 				matchingPlayer.matchFoundTaskCompletionSource.SetResult(result);
@@ -132,12 +166,8 @@ namespace BattleBlast
 
 			RemoveQueueEntry(player);
 		}
-
-		private Battle CreateNewBattle(PlayerData player1, PlayerData player2, BattleCreationData battleCreationData)
-		{
-			return NetServer.Instance.Systems.BattleManager.CreateBattleFor(player1, player2, battleCreationData);
-		}
 		#endregion
+
 
 		#region Queue helpers
 		private QueuedPlayer CreatePlayerQueueEntryFor(PlayerData player, MatchMakingSettings matchMakingData)
@@ -164,11 +194,13 @@ namespace BattleBlast
 		}
 		#endregion
 
-		#region Tear down
+
+		#region Cleanup
 		public override void Dispose()
 		{
 			CancelAllQueuedPlayers();
 			queue.Clear();
+			NetDataEventManager.Instance.DeregisterHandler(dataHandler);
 
 			base.Dispose();
 		}

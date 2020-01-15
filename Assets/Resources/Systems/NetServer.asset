@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: NetServer
   m_EditorClassIdentifier: 
   settings:
-    initializeOnAwake: 0
+    initializeOnAwake: 1
     disposeOnDisable: 1
     playModeOnly: 1
   systems:
@@ -22,6 +22,10 @@ MonoBehaviour:
     battleManager: {fileID: 11400000, guid: 046ebfe3f10277d488a5de80f562080a, type: 2}
     clientManager: {fileID: 11400000, guid: 7b059ea0cc9339d449a1cbec22c826cc, type: 2}
   host: {fileID: 0}
+  startServerEvent:
+    inspectedEvent: {fileID: 11400000, guid: fab66863ca4be9a4991705d479dc3c0f, type: 2}
+  stopServerEvent:
+    inspectedEvent: {fileID: 11400000, guid: 70386b963bcebaf4eb86de81fcee7c19, type: 2}
   OnConnect:
     inspectedEvent: {fileID: 0}
   OnDisconnect:

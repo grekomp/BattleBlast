@@ -14,7 +14,7 @@ namespace Networking
 		public Type dataType;
 		public object data;
 		public bool responseRequired = false;
-		public bool responseSent = false;
+		public bool requestHandled = false;
 
 		public NetReceivedData(NetConnection connection, Type dataType, object data, string id = null, bool responseRequired = false)
 		{
@@ -40,7 +40,7 @@ namespace Networking
 
 		public void SendResponse(object responseData)
 		{
-			responseSent = true;
+			requestHandled = true;
 			connection.Send(NetDataPackage.CreateFrom(responseData, id));
 		}
 	}

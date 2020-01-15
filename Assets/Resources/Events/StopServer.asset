@@ -9,13 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bc38b405e6eef9418321025c7497354, type: 3}
-  m_Name: MatchMaker
+  m_Script: {fileID: 11500000, guid: d440ae97eed15d84eabd5a17c946021a, type: 3}
+  m_Name: StopServer
   m_EditorClassIdentifier: 
-  settings:
-    initializeOnAwake: 1
-    disposeOnDisable: 1
-    playModeOnly: 1
-  matchMakerSettings:
-    queueTimeoutLimit: 2000
-  queue: []
+  debug: 0

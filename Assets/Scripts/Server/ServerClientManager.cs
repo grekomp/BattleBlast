@@ -65,6 +65,21 @@ namespace BattleBlast.Server
 			if (connectedClient != null) RemoveConnectedClient(connectedClient);
 		}
 
+		public void DisconnectAllClients()
+		{
+			foreach (var connection in new List<NetConnection>(unauthenticatedClientConnections))
+			{
+				connection?.Disconnect();
+			}
+
+			foreach (var connectedClient in new List<ConnectedClient>(connectedClients))
+			{
+				connectedClient?.Connection?.Disconnect();
+			}
+
+			unauthenticatedClientConnections.Clear();
+			connectedClients.Clear();
+		}
 		protected void AddConnectedClient(ConnectedClient connectedClient)
 		{
 			connectedClients.Add(connectedClient);
@@ -107,6 +122,17 @@ namespace BattleBlast.Server
 				connectedClient = null;
 				return false;
 			}
+		}
+		#endregion
+
+
+		#region Cleanup
+		public override void Dispose()
+		{
+			base.Dispose();
+
+			DisconnectAllClients();
+			NetDataEventManager.Instance.DeregisterHandler(dataHandler);
 		}
 		#endregion
 	}

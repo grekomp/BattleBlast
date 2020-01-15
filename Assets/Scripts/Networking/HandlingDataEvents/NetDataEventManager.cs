@@ -42,7 +42,7 @@ namespace Networking
 				if (handler.IsOneShotHandler) DeregisterHandler(handler);
 			}
 
-			if (receivedData.responseRequired && receivedData.responseSent == false)
+			if (receivedData.responseRequired && receivedData.requestHandled == false)
 			{
 				receivedData.SendResponse(new NullResponseData());
 			}

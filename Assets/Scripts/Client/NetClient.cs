@@ -63,9 +63,7 @@ namespace BattleBlast
 		private void OnEnable()
 		{
 			// Register event listeners
-			NetCore.Instance.OnConnectEvent.RegisterListenerOnce(HandleConnect);
-			NetCore.Instance.OnDisconnectEvent.RegisterListenerOnce(HandleDisconnect);
-			NetCore.Instance.OnDataReceivedEvent.RegisterListenerOnce(HandleDataReceived);
+			host.OnConnectEvent.RegisterListenerOnce(HandleConnect);
 			NetCore.Instance.OnBroadcastEvent.RegisterListenerOnce(HandleBroadcastEvent);
 		}
 		private void OnDisable()
@@ -130,6 +128,9 @@ namespace BattleBlast
 				connection = await host.ConnectWithConfirmation(broadcastData.senderAddress, broadcastData.broadcastMessagePort);
 				if (connection != null)
 				{
+					connection.OnDisconnectEvent.RegisterListenerOnce(HandleDisconnect);
+					connection.OnDataEvent.RegisterListenerOnce(HandleDataReceived);
+
 					state = ClientState.Connected;
 					return true;
 				}
@@ -246,6 +247,8 @@ namespace BattleBlast
 		protected void HandleDisconnect()
 		{
 			state = ClientState.NotConnected;
+			authToken = null;
+			playerId = null;
 			OnDisconnect?.Raise(this);
 		}
 		protected void HandleDataReceived(GameEventData gameEventData)

@@ -145,7 +145,10 @@ namespace Networking
 				{
 					NetConnection connection = NetConnection.New(receivedConnectionId, host);
 					host.AddConnection(connection);
+					host.HandleConnectEvent(connection);
 					connection.ConfirmConnection();
+
+					OnConnectEvent?.Raise(this, connection);
 				}
 			}
 			else
@@ -170,10 +173,12 @@ namespace Networking
 
 			Log.Verbose(LogTag, $"Received data from: HostId: {receivedHostId}, ConnectionId: {receivedConnectionId}. \nDataId: {receivedDataPackage.id}, Data: {receivedDataPackage.GetDataAs<object>()}.");
 
-			NetConnection connection = GetHost(receivedHostId).GetConnection(receivedConnectionId);
+			NetHost host = GetHost(receivedHostId);
+			NetConnection connection = host.GetConnection(receivedConnectionId);
 			NetReceivedData receivedData = new NetReceivedData(connection, receivedDataPackage);
 
 			NetDataEventManager.Instance.HandleDataEvent(receivedData);
+			host.HandleDataEvent(receivedData);
 
 			OnDataReceivedEvent?.Raise(this, receivedData);
 		}

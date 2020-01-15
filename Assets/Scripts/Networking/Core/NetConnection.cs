@@ -64,7 +64,7 @@ namespace Networking
 		[ContextMenu("Disconnect")]
 		public void Disconnect()
 		{
-			GetHost().Disconnect(this);
+			GetHost()?.Disconnect(this);
 			GetHost = () => null;
 		}
 		#endregion

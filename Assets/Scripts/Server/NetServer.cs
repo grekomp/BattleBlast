@@ -18,9 +18,18 @@ namespace BattleBlast.Server
 		[Header("Server options")]
 		[SerializeField] private ServerSystems systems = new ServerSystems();
 
-
 		[Header("Runtime Variables")]
 		public NetHost host;
+
+		[Header("Event handlers")]
+		public GameEventHandler startServerEvent = new GameEventHandler();
+		public GameEventHandler stopServerEvent = new GameEventHandler();
+
+		[Header("Raised events")]
+		public GameEventHandler OnConnect;
+		public GameEventHandler OnDisconnect;
+		public GameEventHandler OnDataReceived;
+		public GameEventHandler OnDataSent;
 
 
 		#region Public properties
@@ -33,16 +42,9 @@ namespace BattleBlast.Server
 		{
 			base.OnInitialize();
 
-			host = NetCore.Instance.AddHost();
-
-			// Initialize systems
-			systems.Initialize();
-
 			// Register event listeners
-			host.OnConnectEvent.RegisterListenerOnce(HandleConnect);
-			host.OnDisconnectEvent.RegisterListenerOnce(HandleDisconnect);
-			host.OnDataEvent.RegisterListenerOnce(HandleDataReceived);
-			host.OnBroadcastEvent.RegisterListenerOnce(HandleBroadcastEvent);
+			startServerEvent.RegisterListenerOnce(StartServer);
+			stopServerEvent.RegisterListenerOnce(StopServer);
 		}
 		#endregion
 
@@ -52,7 +54,22 @@ namespace BattleBlast.Server
 		public void StartServer()
 		{
 			Log.Info(LogTag, "Starting server...", this);
+			// Initialize server
 			Initialize();
+
+			// Add host
+			host = NetCore.Instance.AddHost();
+
+			// Initialize systems
+			systems.Initialize();
+
+			// Register host event listeners
+			host.OnConnectEvent.RegisterListenerOnce(HandleConnect);
+			host.OnDisconnectEvent.RegisterListenerOnce(HandleDisconnect);
+			host.OnDataEvent.RegisterListenerOnce(HandleDataReceived);
+			host.OnBroadcastEvent.RegisterListenerOnce(HandleBroadcastEvent);
+
+			// Start broadcasting
 			NetCore.Instance.StartBroadcastDiscovery(host.Port);
 			Log.Info(LogTag, $"Server started on HostId: {host.Id}, Port: {host.Port}.", this);
 		}
@@ -61,6 +78,7 @@ namespace BattleBlast.Server
 		{
 			Log.Info(LogTag, "Stopping server...", this);
 			NetCore.Instance.StopBroadcastDiscovery();
+			Dispose();
 			Log.Info(LogTag, "Server stopped.", this);
 		}
 		#endregion
@@ -90,13 +108,6 @@ namespace BattleBlast.Server
 		{
 
 		}
-
-		[Header("Events")]
-		public GameEventHandler OnConnect;
-		public GameEventHandler OnDisconnect;
-		public GameEventHandler OnDataReceived;
-		public GameEventHandler OnDataSent;
-
 		#endregion
 
 		#region Cleanup
@@ -104,15 +115,8 @@ namespace BattleBlast.Server
 		{
 			if (NetCore.InstanceExists == false) return;
 
-			NetCore.Instance.RemoveHost(host);
-
 			systems.Dispose();
-
-			// Deregister event listeners
-			NetCore.Instance.OnConnectEvent.DeregisterListener(HandleConnect);
-			NetCore.Instance.OnDisconnectEvent.DeregisterListener(HandleDisconnect);
-			NetCore.Instance.OnDataReceivedEvent.DeregisterListener(HandleDataReceived);
-			NetCore.Instance.OnBroadcastEvent.DeregisterListener(HandleBroadcastEvent);
+			NetCore.Instance.RemoveHost(host);
 
 			base.Dispose();
 		}
