@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-public abstract class ScriptableVariableReference {
+[Serializable]
+public abstract class ScriptableVariableReference
+{
 	#region Getting values
 	public abstract ScriptableVariable GetValueAsVariable();
 	public abstract ScriptableVariable GetValueAsNewVariable();
@@ -18,7 +20,8 @@ public abstract class ScriptableVariableReference {
 	#region Change events
 	public event Action OnChanged;
 
-	public virtual void HandleChange() {
+	public virtual void HandleChange()
+	{
 		HandleChanged();
 	}
 	protected void HandleChanged() => OnChanged?.Invoke();
@@ -31,7 +34,8 @@ public abstract class ScriptableVariableReference {
 }
 
 [Serializable]
-public class ScriptableVariableReference<T, K> : ScriptableVariableReference, ISerializationCallbackReceiver where K : ScriptableVariable<T> {
+public class ScriptableVariableReference<T, K> : ScriptableVariableReference, ISerializationCallbackReceiver where K : ScriptableVariable<T>
+{
 	#region Value
 	public bool useConstant = true;
 	public T constantValue = default(T);
@@ -57,10 +61,12 @@ public class ScriptableVariableReference<T, K> : ScriptableVariableReference, IS
 
 	public T Value {
 		get {
-			if (useConstant == false) {
+			if (useConstant == false)
+			{
 				if (Variable != null) return Variable.Value;
 
-				if (UsesTemporaryVariable) {
+				if (UsesTemporaryVariable)
+				{
 					UsesTemporaryVariable = false;
 					useConstant = true;
 				}
@@ -69,17 +75,21 @@ public class ScriptableVariableReference<T, K> : ScriptableVariableReference, IS
 			return constantValue;
 		}
 		set {
-			if (useConstant == false) {
-				if (Variable != null) {
+			if (useConstant == false)
+			{
+				if (Variable != null)
+				{
 					Variable.Value = value;
 				}
-				else {
+				else
+				{
 					useConstant = true;
 					constantValue = value;
 					UsesTemporaryVariable = false;
 				}
 			}
-			else {
+			else
+			{
 				constantValue = value;
 			}
 
@@ -89,40 +99,49 @@ public class ScriptableVariableReference<T, K> : ScriptableVariableReference, IS
 	#endregion
 
 	#region Constructors
-	public ScriptableVariableReference() {
+	public ScriptableVariableReference()
+	{
 		useConstant = true;
 		constantValue = default(T);
 	}
-	public ScriptableVariableReference(T value) {
+	public ScriptableVariableReference(T value)
+	{
 		SetAndUseValue(value);
 	}
-	public ScriptableVariableReference(K variable) {
+	public ScriptableVariableReference(K variable)
+	{
 		SetAndUseVariable(variable);
 	}
 	#endregion
 
 	#region Setting and getting values
-	public override void SetAndUseVariable(ScriptableVariable variable) {
+	public override void SetAndUseVariable(ScriptableVariable variable)
+	{
 		K castedVariable = variable as K;
-		if (castedVariable) {
+		if (castedVariable)
+		{
 			Variable = castedVariable;
 			useConstant = false;
 			HandleChange();
 		}
 	}
-	public void SetAndUseVariable(K scriptableVariable) {
+	public void SetAndUseVariable(K scriptableVariable)
+	{
 		Variable = scriptableVariable;
 		useConstant = false;
 		HandleValueChange();
 	}
-	public void SetAndUseVariable(T value) {
+	public void SetAndUseVariable(T value)
+	{
 		UseTemporaryVariable();
 		variable.Value = value;
 	}
-	public void SetAndUseVariable() {
+	public void SetAndUseVariable()
+	{
 		UseTemporaryVariable();
 	}
-	public void SetAndUseValue(T value) {
+	public void SetAndUseValue(T value)
+	{
 		constantValue = value;
 		useConstant = true;
 		HandleChange();
@@ -132,8 +151,10 @@ public class ScriptableVariableReference<T, K> : ScriptableVariableReference, IS
 	/// Returns the currently used variable, or creates a new one.
 	/// </summary>
 	/// <returns>A ScriptableVariable containing the current value of this reference.</returns>
-	public override ScriptableVariable GetValueAsVariable() {
-		if (useConstant) {
+	public override ScriptableVariable GetValueAsVariable()
+	{
+		if (useConstant)
+		{
 			UseTemporaryVariable();
 		}
 
@@ -142,13 +163,15 @@ public class ScriptableVariableReference<T, K> : ScriptableVariableReference, IS
 	/// <summary>
 	/// Creates a new variable with a copy of this references value.
 	/// </summary>
-	public override ScriptableVariable GetValueAsNewVariable() {
+	public override ScriptableVariable GetValueAsNewVariable()
+	{
 		K variable = ScriptableObject.CreateInstance<K>();
 		variable.Value = Value;
 		return variable;
 	}
 
-	protected void UseTemporaryVariable() {
+	protected void UseTemporaryVariable()
+	{
 		SetAndUseVariable(GetValueAsNewVariable());
 		UsesTemporaryVariable = true;
 	}
@@ -157,12 +180,16 @@ public class ScriptableVariableReference<T, K> : ScriptableVariableReference, IS
 	/// Switches this reference to use a variable instead of contantValue. Creates a temporary variable if one is not already present.
 	/// </summary>
 	/// <param name="setValueFromConstantValueIfSwitching">If variable is not null, should this operation copy it's value from constantValue.</param>
-	protected override void SwitchToVariable(bool setValueFromConstantValueIfSwitching = true, bool useTemporaryVariableIfNull = true) {
-		if (useConstant) {
-			if (Variable == null && useTemporaryVariableIfNull) {
+	protected override void SwitchToVariable(bool setValueFromConstantValueIfSwitching = true, bool useTemporaryVariableIfNull = true)
+	{
+		if (useConstant)
+		{
+			if (Variable == null && useTemporaryVariableIfNull)
+			{
 				UseTemporaryVariable();
 			}
-			else {
+			else
+			{
 				useConstant = false;
 				if (setValueFromConstantValueIfSwitching) Value = constantValue;
 			}
@@ -173,12 +200,16 @@ public class ScriptableVariableReference<T, K> : ScriptableVariableReference, IS
 	/// <summary>
 	/// Switches the reference to use a constant value instead of a variable
 	/// </summary>
-	public void SwitchToConstantValue(bool setValueFromVariableIfSwitching = true) {
-		if (useConstant == false) {
-			if (setValueFromVariableIfSwitching && Variable != null) {
+	public void SwitchToConstantValue(bool setValueFromVariableIfSwitching = true)
+	{
+		if (useConstant == false)
+		{
+			if (setValueFromVariableIfSwitching && Variable != null)
+			{
 				SetAndUseValue(Value);
 			}
-			else {
+			else
+			{
 				useConstant = true;
 			}
 
@@ -196,11 +227,14 @@ public class ScriptableVariableReference<T, K> : ScriptableVariableReference, IS
 	/// Raises change events on this scriptableVariableReference and the bound variable
 	/// </summary>
 	[ContextMenu("Handle Change")]
-	public override void HandleChange() {
-		if (useConstant) {
+	public override void HandleChange()
+	{
+		if (useConstant)
+		{
 			HandleValueChange();
 		}
-		else {
+		else
+		{
 			Variable?.HandleChange();
 		}
 
@@ -209,7 +243,8 @@ public class ScriptableVariableReference<T, K> : ScriptableVariableReference, IS
 	/// <summary>
 	/// Raises change events on this scriptableVaribleReference only
 	/// </summary>
-	public void HandleValueChange() {
+	public void HandleValueChange()
+	{
 		HandleChanged();
 		HandleValueChanged(Value);
 	}
@@ -219,11 +254,13 @@ public class ScriptableVariableReference<T, K> : ScriptableVariableReference, IS
 	#endregion
 
 	#region Binding variable change events
-	protected void BindVariable(K value) {
+	protected void BindVariable(K value)
+	{
 		previousVariable = value;
 		variable = value;
 
-		if (Variable != null) {
+		if (Variable != null)
+		{
 			Variable.OnChanged += HandleChanged;
 			Variable.OnValueChanged += HandleValueChanged;
 			Variable.OnVariableValueChanged += HandleVariableValueChanged;
@@ -231,8 +268,10 @@ public class ScriptableVariableReference<T, K> : ScriptableVariableReference, IS
 
 		OnVariableChanged?.Invoke(Variable);
 	}
-	protected virtual void UnbindCurrentVariable() {
-		if (previousVariable != null) {
+	protected virtual void UnbindCurrentVariable()
+	{
+		if (previousVariable != null)
+		{
 			previousVariable.OnChanged -= HandleChanged;
 			previousVariable.OnValueChanged -= HandleValueChanged;
 			previousVariable.OnVariableValueChanged -= HandleVariableValueChanged;
@@ -241,21 +280,27 @@ public class ScriptableVariableReference<T, K> : ScriptableVariableReference, IS
 	#endregion
 
 	#region Replacing variables
-	public override void GatherReplaceableVariables(ref List<ScriptableVariable> replaceableVariables) {
-		if (Variable != null) {
+	public override void GatherReplaceableVariables(ref List<ScriptableVariable> replaceableVariables)
+	{
+		if (Variable != null)
+		{
 			replaceableVariables.Add(Variable);
 		}
 	}
-	public virtual void ReplaceVariable(ScriptableVariable from, K to) {
-		if (Variable == from) {
+	public virtual void ReplaceVariable(ScriptableVariable from, K to)
+	{
+		if (Variable == from)
+		{
 			SetAndUseVariable(to);
 			DebugVariableReplaced(from, to);
 		}
 
 		DebugVariableReplacementFailed(from, to);
 	}
-	public override bool TryReplaceVariable(ScriptableVariable from, ScriptableVariable to) {
-		if (Variable != null && Variable.IsAReplacement(from, to)) {
+	public override bool TryReplaceVariable(ScriptableVariable from, ScriptableVariable to)
+	{
+		if (Variable != null && Variable.IsAReplacement(from, to))
+		{
 			SetAndUseVariable(to as K);
 			DebugVariableReplaced(from, to);
 			return true;
@@ -267,25 +312,31 @@ public class ScriptableVariableReference<T, K> : ScriptableVariableReference, IS
 	#endregion
 
 	#region Serialization helpers
-	public virtual void OnAfterDeserialize() {
+	public virtual void OnAfterDeserialize()
+	{
 		ValidateBoundVariable();
 		HandleChange();
 	}
-	public virtual void OnBeforeSerialize() {
+	public virtual void OnBeforeSerialize()
+	{
 		ValidateBoundVariable();
 	}
-	public virtual void OnValidate() {
+	public virtual void OnValidate()
+	{
 		ValidateBoundVariable();
 		HandleChange();
 	}
 
-	private void ValidateBoundVariable() {
-		if (UsesTemporaryVariable && variable == null) {
+	private void ValidateBoundVariable()
+	{
+		if (UsesTemporaryVariable && variable == null)
+		{
 			UsesTemporaryVariable = false;
 			useConstant = true;
 		}
 
-		if (previousVariable != variable) {
+		if (previousVariable != variable)
+		{
 			Variable = variable;
 		}
 	}
@@ -303,25 +354,32 @@ public class ScriptableVariableReference<T, K> : ScriptableVariableReference, IS
 	[SerializeField]
 	protected bool debugChanges = true;
 
-	protected void DebugVariableReplaced(ScriptableVariable from, ScriptableVariable to) {
-		if (debugEnabled && (debugLogAll || debugVariableReplacements)) {
+	protected void DebugVariableReplaced(ScriptableVariable from, ScriptableVariable to)
+	{
+		if (debugEnabled && (debugLogAll || debugVariableReplacements))
+		{
 			Debug.Log(string.Format("{0} (ScriptableVariableReference): Replaced variable {1} with {2}. New value is {3}.", this, from, to, to.ValueObject));
 		}
 	}
-	protected void DebugVariableReplacementFailed(ScriptableVariable from, ScriptableVariable to) {
-		if (debugEnabled && (debugLogAll || debugFailedVariableReplacements)) {
+	protected void DebugVariableReplacementFailed(ScriptableVariable from, ScriptableVariable to)
+	{
+		if (debugEnabled && (debugLogAll || debugFailedVariableReplacements))
+		{
 			Debug.Log(string.Format("{0} (ScriptableVariableReference): Failed replacing variable {1} with {2}. Contained variable: {3}", this, from, to, Variable));
 		}
 	}
-	protected void DebugChanged() {
-		if (debugEnabled && (debugLogAll || debugChanges)) {
+	protected void DebugChanged()
+	{
+		if (debugEnabled && (debugLogAll || debugChanges))
+		{
 			Debug.Log(string.Format("{0} (ScriptableVariableReference): Value changed.", this));
 		}
 	}
 	#endregion
 
 	#region Operators
-	public static implicit operator T(ScriptableVariableReference<T, K> reference) {
+	public static implicit operator T(ScriptableVariableReference<T, K> reference)
+	{
 		return reference.Value;
 	}
 	#endregion

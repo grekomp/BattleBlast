@@ -13,45 +13,16 @@ MonoBehaviour:
   m_Name: MainDatabase
   m_EditorClassIdentifier: 
   playerDataCollection:
-  - id:
-      useConstant: 1
-      constantValue: 76cc0e75-552e-45a2-b7b5-892c488ca164
-      variable: {fileID: 0}
-      _usesTemporaryVariable: 0
-      debugEnabled: 0
-      debugLogAll: 1
-      debugVariableReplacements: 1
-      debugFailedVariableReplacements: 0
-      debugChanges: 1
-    username:
-      useConstant: 1
-      constantValue: Grekomp
-      variable: {fileID: 0}
-      _usesTemporaryVariable: 0
-      debugEnabled: 0
-      debugLogAll: 0
-      debugVariableReplacements: 0
-      debugFailedVariableReplacements: 0
-      debugChanges: 0
+  - id: 12f66001-8d6f-4e26-8e07-02eda6a7f7af
+    username: Grekomp
     password: 123
-  - id:
-      useConstant: 1
-      constantValue: 779a4bca-723c-4075-ae23-2d4540f77f02
-      variable: {fileID: 0}
-      _usesTemporaryVariable: 0
-      debugEnabled: 0
-      debugLogAll: 1
-      debugVariableReplacements: 1
-      debugFailedVariableReplacements: 0
-      debugChanges: 1
-    username:
-      useConstant: 1
-      constantValue: Piopek
-      variable: {fileID: 0}
-      _usesTemporaryVariable: 0
-      debugEnabled: 0
-      debugLogAll: 0
-      debugVariableReplacements: 0
-      debugFailedVariableReplacements: 0
-      debugChanges: 0
-    password: 456
+    friendIds: []
+    coins: 100
+    collectionId: 
+  - id: 5d15e699-155d-4dac-b0c0-c5da1d58cf38
+    username: Piopek
+    password: 123
+    friendIds: []
+    coins: 120
+    collectionId: 
+  unitDataCollection: []

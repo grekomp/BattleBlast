@@ -10,22 +10,23 @@ namespace BattleBlast
 	[Serializable]
 	public class PlayerData : SerializableWideClass
 	{
-		[Id] public StringReference id;
-		public StringReference username;
+		[Id] public string id = Guid.NewGuid().ToString();
+		public string username;
+		public string password;
 
-		[SerializeField]
-		protected string password;
+		public List<string> friendIds = new List<string>();
 
-		public List<string> friendIds;
-		public IntReference coins;
+		public int coins;
+		public string collectionId;
 
-		public PlayerCollection collection;
+		public PlayerData()
+		{
+			id = Guid.NewGuid().ToString();
+		}
 
 		public bool IsPasswordValid(string potentialPassword)
 		{
 			return password == potentialPassword;
 		}
-
-		// TODO: Status
 	}
 }

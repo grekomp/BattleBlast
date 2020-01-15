@@ -1,3 +1,6 @@
-﻿public class BattleCreationData
+﻿using System;
+
+[Serializable]
+public class BattleCreationData
 {
 }

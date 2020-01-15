@@ -2,9 +2,10 @@
 
 namespace BattleBlast
 {
+	[Serializable]
 	public class Battle
 	{
-		[Id] public StringReference id = new StringReference(Guid.NewGuid().ToString());
+		public string id;
 
 		private PlayerData player1;
 		private PlayerData player2;
@@ -17,6 +18,7 @@ namespace BattleBlast
 
 		public Battle(PlayerData player1, PlayerData player2, BattleCreationData sourceCreationData)
 		{
+			this.id = Guid.NewGuid().ToString();
 			this.player1 = player1;
 			this.player2 = player2;
 			this.sourceCreationData = sourceCreationData;
