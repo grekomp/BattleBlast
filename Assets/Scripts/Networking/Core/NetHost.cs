@@ -61,6 +61,8 @@ namespace Networking
 		{
 			connection.HandleDisconnectEvent();
 			OnDisconnectEvent?.Raise(this, connection);
+
+			Destroy(connection);
 		}
 		public void HandleBroadcastEvent(ReceivedBroadcastData receivedBroadcastData)
 		{

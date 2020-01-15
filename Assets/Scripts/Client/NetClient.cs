@@ -65,6 +65,8 @@ namespace BattleBlast
 			// Register event listeners
 			host.OnConnectEvent.RegisterListenerOnce(HandleConnect);
 			NetCore.Instance.OnBroadcastEvent.RegisterListenerOnce(HandleBroadcastEvent);
+
+			TryConnectToServer();
 		}
 		private void OnDisable()
 		{
@@ -249,6 +251,8 @@ namespace BattleBlast
 			state = ClientState.NotConnected;
 			authToken = null;
 			playerId = null;
+			connection = null;
+
 			OnDisconnect?.Raise(this);
 		}
 		protected void HandleDataReceived(GameEventData gameEventData)

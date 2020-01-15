@@ -44,7 +44,7 @@ namespace Networking
 
 			if (receivedData.responseRequired && receivedData.requestHandled == false)
 			{
-				receivedData.SendResponse(new NullResponseData());
+				receivedData.SendResponse(null, new RequestUnhandledError());
 			}
 		}
 		#endregion

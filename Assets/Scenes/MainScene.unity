@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 11133675}
   - component: {fileID: 11133676}
   - component: {fileID: 11133677}
+  - component: {fileID: 11133678}
   m_Layer: 0
   m_Name: ClientTesters
   m_TagString: Untagged
@@ -181,6 +182,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerId: 76cc0e75-552e-45a2-b7b5-892c488ca164
+--- !u!114 &11133678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 11133674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 884af027628698c41abe778341551f7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent:
+    inspectedEvent: {fileID: 11400000, guid: dc7019a225a326444950c39cc08addcb, type: 2}
+  enableInEditor: 1
+  debug: 0
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 11133676}
+        m_MethodName: TryAuthenticatePlayer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  responseWithData:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!224 &31058539 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7093586872740868090, guid: c21261bf5bd786e4bae651e1c0163e8b,
@@ -1001,6 +1035,7 @@ GameObject:
   - component: {fileID: 812126921}
   - component: {fileID: 812126923}
   - component: {fileID: 812126924}
+  - component: {fileID: 812126925}
   m_Layer: 0
   m_Name: NetworkingClient
   m_TagString: Untagged
@@ -1021,16 +1056,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   networkingClientSettings:
-    connectToServerTimeout: 2000
+    connectToServerTimeout: -1
   state: 0
   host: {fileID: 0}
   connection: {fileID: 0}
   authToken: 
   playerId: 
   OnConnect:
-    inspectedEvent: {fileID: 0}
+    inspectedEvent: {fileID: 11400000, guid: dc7019a225a326444950c39cc08addcb, type: 2}
   OnDisconnect:
-    inspectedEvent: {fileID: 0}
+    inspectedEvent: {fileID: 11400000, guid: 684d22d46a6e2c243a5fadecd47b0ec1, type: 2}
   OnDataReceived:
     inspectedEvent: {fileID: 0}
   OnDataSent:
@@ -1103,6 +1138,39 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 812126921}
         m_MethodName: DisconnectFromServer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  responseWithData:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &812126925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812126920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 884af027628698c41abe778341551f7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent:
+    inspectedEvent: {fileID: 11400000, guid: 684d22d46a6e2c243a5fadecd47b0ec1, type: 2}
+  enableInEditor: 1
+  debug: 0
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 812126921}
+        m_MethodName: TryConnectToServer
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

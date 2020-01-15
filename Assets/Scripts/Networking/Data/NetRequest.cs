@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utils;
 
 namespace Networking
 {
 	[Serializable]
 	public class NetRequest
 	{
+		public static readonly string LogTag = nameof(NetRequest);
+
+
 		public string id = Guid.NewGuid().ToString();
 		public NetConnection connection = null;
 		public NetReceivedData response = null;
@@ -57,6 +61,9 @@ namespace Networking
 		public void SetResponse(NetReceivedData receivedData)
 		{
 			response = receivedData;
+
+			if (response.error != null) Log.Warning(LogTag, $"Request responded with error. Error: {response.error}, RequestId: {id}.");
+
 			responseTaskCompletionSource.TrySetResult(response);
 		}
 

@@ -15,33 +15,36 @@ namespace Networking
 		public object data;
 		public bool responseRequired = false;
 		public bool requestHandled = false;
+		public Error error;
 
-		public NetReceivedData(NetConnection connection, Type dataType, object data, string id = null, bool responseRequired = false)
-		{
-			this.connection = connection;
-			this.dataType = data.GetType();
-			this.data = data;
-			this.id = id ?? Guid.NewGuid().ToString();
-			this.responseRequired = responseRequired;
-		}
 		public NetReceivedData(NetConnection connection, NetDataPackage dataPackage)
 		{
 			this.connection = connection;
 			id = dataPackage.id;
-			dataType = Type.GetType(dataPackage.dataType);
+			dataType = dataPackage.dataType != null ? Type.GetType(dataPackage.dataType) : null;
 			data = dataPackage.serializedData.Deserialize();
 			responseRequired = dataPackage.responseRequired;
+			error = (Error)dataPackage.serializedError.Deserialize();
 		}
 
 		public T GetData<T>()
 		{
 			return (T)data;
 		}
+		public T GetDataOrDefault<T>()
+		{
+			if (data is T dataT)
+			{
+				return dataT;
+			}
 
-		public void SendResponse(object responseData)
+			return default;
+		}
+
+		public void SendResponse(object responseData, Error error = null)
 		{
 			requestHandled = true;
-			connection.Send(NetDataPackage.CreateFrom(responseData, id));
+			connection.Send(NetDataPackage.CreateFrom(responseData, id, error: error));
 		}
 	}
 }

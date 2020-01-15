@@ -47,8 +47,8 @@ namespace BattleBlast
 
 			await Task.WhenAll(request1.WaitForResponse(), request2.WaitForResponse());
 
-			bool player01Loaded = request1.response.GetData<bool>();
-			bool player02Loaded = request2.response.GetData<bool>();
+			bool player01Loaded = request1.response.GetDataOrDefault<bool>();
+			bool player02Loaded = request2.response.GetDataOrDefault<bool>();
 
 			return player01Loaded && player02Loaded;
 		}
