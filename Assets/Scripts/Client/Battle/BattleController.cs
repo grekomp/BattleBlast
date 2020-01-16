@@ -167,13 +167,16 @@ namespace BattleBlast
 			}
 		}
 
-		public void HandleUnitActionAttack(NetReceivedData receivedData)
+		public async void HandleUnitActionAttack(NetReceivedData receivedData)
 		{
 			if (receivedData.data is UnitActionAttack unitAction)
 			{
 				BattleUnit battleUnit = GetBattleUnit(unitAction.unitInstanceId);
 
-				battleUnit.HandleUnitActionAttack(unitAction);
+				await battleUnit.HandleUnitActionAttack(unitAction);
+
+				BattleUnit targetUnit = GetBattleUnit(unitAction.targetUnitInstanceId);
+				targetUnit.SetCount(targetUnit.count - unitAction.killedMen);
 
 				receivedData.SendResponse(true);
 			}
@@ -236,6 +239,11 @@ namespace BattleBlast
 			{
 				SendUnitOrderMove(battleUnit.tile.x, battleUnit.tile.y);
 			}
+
+			if (battleUnit == selectedUnit)
+			{
+				SendUnitOrderStop(battleUnit);
+			}
 		}
 
 		public void HandleBoardTileLeftClicked(BoardTile tile)
@@ -265,6 +273,21 @@ namespace BattleBlast
 					selectedUnit.ShowOrderArrow(x, y);
 				}
 			}
+		}
+		private async void SendUnitOrderStop(BattleUnit battleUnit)
+		{
+			UnitOrderStop order = new UnitOrderStop(battleData.id, battleUnit.unitInstanceId);
+
+			var request = NetRequest.CreateAndSend(NetClient.Instance.connection, order);
+			var response = await request.WaitForResponse();
+			if (response.error == null)
+			{
+				if (response.GetDataOrDefault<bool>())
+				{
+					selectedUnit.HideOrderArrow();
+				}
+			}
+
 		}
 
 		public IEnumerator StartTurnTimer()

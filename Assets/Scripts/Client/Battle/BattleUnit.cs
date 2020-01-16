@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace BattleBlast
 {
@@ -13,6 +16,16 @@ namespace BattleBlast
 		[Space]
 		public GameObject selectionHighlight;
 		public GameObject orderPreviewArrow;
+		[Space]
+		public TextMeshProUGUI attackText;
+		public TextMeshProUGUI countText;
+
+
+		[Space]
+		public Image unitBox;
+		public Color friendlyUnitColor;
+		public Color enemyUnitColor;
+
 
 		[Header("Runtime variables")]
 		public string unitInstanceId;
@@ -29,13 +42,30 @@ namespace BattleBlast
 		public void Initialize(UnitInstanceData unitInstanceData)
 		{
 			unitInstanceId = unitInstanceData.unitInstanceId;
-			attack.Value = unitInstanceData.attack;
-			count.Value = unitInstanceData.count;
+			SetAttack(unitInstanceData.attack);
+			SetCount(unitInstanceData.count);
 			playerId = unitInstanceData.playerId;
 			isFriendlyUnit.Value = playerId == NetClient.Instance.PlayerId;
 
+			SetColor();
+
 			tile = BattleController.Instance.board[unitInstanceData.x, unitInstanceData.y];
 			transform.position = tile.centerTransform.position;
+		}
+
+		private void SetColor()
+		{
+			unitBox.color = isFriendlyUnit ? friendlyUnitColor : enemyUnitColor;
+		}
+		public void SetAttack(int attack)
+		{
+			this.attack.Value = attack;
+			attackText.text = attack.ToString();
+		}
+		public void SetCount(int count)
+		{
+			this.count.Value = count;
+			countText.text = count.ToString();
 		}
 		#endregion
 
@@ -90,9 +120,9 @@ namespace BattleBlast
 		{
 			HideOrderArrow();
 		}
-		public void HandleUnitActionAttack(UnitActionAttack unitAction)
+		public async Task HandleUnitActionAttack(UnitActionAttack unitAction)
 		{
-
+			await Task.Delay(100);
 		}
 		public void HandleUnitActionRetaliate(UnitActionRetaliate unitAction)
 		{

@@ -1,7 +1,8 @@
 {
     "name": "GameCodeAssembly",
     "references": [
-        "GUID:41fbd3fb5c9897a4c986adbf2d9cec5f"
+        "GUID:41fbd3fb5c9897a4c986adbf2d9cec5f",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

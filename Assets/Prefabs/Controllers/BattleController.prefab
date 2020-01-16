@@ -53,9 +53,9 @@ MonoBehaviour:
     unitsOnBoard: []
   selectedUnit: {fileID: 0}
   turnTimeSeconds:
-    useConstant: 1
+    useConstant: 0
     constantValue: 0
-    variable: {fileID: 0}
+    variable: {fileID: 11400000, guid: 39163b2a03570dc498332e91a8fe3295, type: 2}
     _usesTemporaryVariable: 0
     debugEnabled: 0
     debugLogAll: 1
@@ -63,9 +63,9 @@ MonoBehaviour:
     debugFailedVariableReplacements: 0
     debugChanges: 1
   turnNormalizedTime:
-    useConstant: 1
+    useConstant: 0
     constantValue: 0
-    variable: {fileID: 0}
+    variable: {fileID: 11400000, guid: a09af52198b398f4686b638bacdc7928, type: 2}
     _usesTemporaryVariable: 0
     debugEnabled: 0
     debugLogAll: 1

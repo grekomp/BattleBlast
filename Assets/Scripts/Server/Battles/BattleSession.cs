@@ -21,7 +21,7 @@ namespace BattleBlast.Server
 		public ConnectedClient player1;
 		public ConnectedClient player2;
 
-		public int turnTime = 20000;
+		public int turnTime = 5000;
 		public int turnEndingTime = 3000;
 		public DateTime nextTurnTime;
 
@@ -235,6 +235,14 @@ namespace BattleBlast.Server
 			UnitInstanceData unit = GetUnitInstanceData(order.unitInstanceId);
 			UnitInstanceData target = GetOrderTargetUnit(order);
 
+			int xOffset = order.targetX - unit.x;
+			int yOffset = order.targetY - unit.y;
+
+			if (xOffset < 0) unit.direction = MoveDirection.Left;
+			if (xOffset > 0) unit.direction = MoveDirection.Right;
+			if (yOffset < 0) unit.direction = MoveDirection.Up;
+			if (yOffset > 0) unit.direction = MoveDirection.Down;
+
 			if (unit == null) return;
 
 			if (target != null)
@@ -308,6 +316,16 @@ namespace BattleBlast.Server
 			phaseTimerCancellationTokenSource = new CancellationTokenSource();
 
 			battlePhase = BattlePhase.PlanningPhase;
+
+			orders.Clear();
+			foreach (var unit in battleData.unitsOnBoard)
+			{
+				if (unit.direction != MoveDirection.None)
+				{
+					orders.Add(new UnitOrderMove(battleData.id, unit.unitInstanceId, GetNextX(unit.x, unit.direction), GetNextY(unit.y, unit.direction)));
+				}
+			}
+
 			await SendBattleCommandStartPlannigPhase();
 
 			nextTurnTime = DateTime.Now.AddMilliseconds(turnTime);
@@ -362,7 +380,22 @@ namespace BattleBlast.Server
 		#endregion
 
 
-		#region Data access helpers
+		#region Helper methods
+		protected int GetNextX(int x, MoveDirection moveDirection)
+		{
+			if (moveDirection == MoveDirection.Right) return x + 1;
+			if (moveDirection == MoveDirection.Left) return x - 1;
+
+			return x;
+		}
+		protected int GetNextY(int y, MoveDirection moveDirection)
+		{
+			if (moveDirection == MoveDirection.Up) return y - 1;
+			if (moveDirection == MoveDirection.Down) return y + 1;
+
+			return y;
+		}
+
 		protected UnitInstanceData GetOrderTargetUnit(UnitOrderMove moveOrder)
 		{
 			return battleData.unitsOnBoard.Find(u => u.x == moveOrder.targetX && u.y == moveOrder.targetY);
