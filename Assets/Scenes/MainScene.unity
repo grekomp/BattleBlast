@@ -10634,6 +10634,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1090649728}
+  - component: {fileID: 1090649729}
   m_Layer: 5
   m_Name: Battle
   m_TagString: Untagged
@@ -10663,6 +10664,159 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1090649729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1090649727}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80a92a8059598244ea12bbfee1c63a32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settings:
+    setOnAwake:
+      useConstant: 1
+      constantValue: 1
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnStart:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnEnable:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnUpdate:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnLateUpdate:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnValidate:
+      useConstant: 1
+      constantValue: 1
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnReplaceVariable:
+      useConstant: 1
+      constantValue: 1
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnValueChanged:
+      useConstant: 1
+      constantValue: 1
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setInEditMode:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    debugEnabled:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+  value:
+    useConstant: 0
+    constantValue: 0
+    variable: {fileID: 11400000, guid: 77b50cc6184fd67498981f80e58a4c9f, type: 2}
+    _usesTemporaryVariable: 0
+    debugEnabled: 0
+    debugLogAll: 1
+    debugVariableReplacements: 1
+    debugFailedVariableReplacements: 0
+    debugChanges: 1
+  onlySetIfValueDiffers:
+    useConstant: 1
+    constantValue: 1
+    variable: {fileID: 0}
+    _usesTemporaryVariable: 0
+    debugEnabled: 0
+    debugLogAll: 1
+    debugVariableReplacements: 1
+    debugFailedVariableReplacements: 0
+    debugChanges: 1
+  onValueChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1308593942}
+        m_MethodName: SetActive
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onValueTrue:
+    m_PersistentCalls:
+      m_Calls: []
+  onValueFalse:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1091762335
 GameObject:
   m_ObjectHideFlags: 0
@@ -12198,6 +12352,12 @@ MonoBehaviour:
   x: 3
   y: 7
   rectTransform: {fileID: 1294670308}
+--- !u!1 &1308593942 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4715575314520545160, guid: 92f56b163205d8d4ca65978e4eb12885,
+    type: 3}
+  m_PrefabInstance: {fileID: 4715575315372873886}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1308593943 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4715575314520545161, guid: 92f56b163205d8d4ca65978e4eb12885,
@@ -14950,6 +15110,8 @@ GameObject:
   - component: {fileID: 1535929429}
   - component: {fileID: 1535929431}
   - component: {fileID: 1535929430}
+  - component: {fileID: 1535929433}
+  - component: {fileID: 1535929432}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -15097,6 +15259,281 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1535929428}
   m_CullTransparentMesh: 0
+--- !u!114 &1535929432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1535929428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6730e95b8ddf06740a307cc4fb93c41a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settings:
+    setOnAwake:
+      useConstant: 1
+      constantValue: 1
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnStart:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnEnable:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnUpdate:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnLateUpdate:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnValidate:
+      useConstant: 1
+      constantValue: 1
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnReplaceVariable:
+      useConstant: 1
+      constantValue: 1
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnValueChanged:
+      useConstant: 1
+      constantValue: 1
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setInEditMode:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    debugEnabled:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+  outputTextSetter: {fileID: 1535929433}
+  output:
+    useConstant: 1
+    constantValue: 20
+    variable: {fileID: 0}
+    _usesTemporaryVariable: 0
+    debugEnabled: 0
+    debugLogAll: 1
+    debugVariableReplacements: 1
+    debugFailedVariableReplacements: 0
+    debugChanges: 1
+  formatString:
+    useConstant: 1
+    constantValue: '{0}'
+    variable: {fileID: 0}
+    _usesTemporaryVariable: 0
+    debugEnabled: 0
+    debugLogAll: 1
+    debugVariableReplacements: 1
+    debugFailedVariableReplacements: 0
+    debugChanges: 1
+  values:
+    useConstant: 1
+    constantValue:
+      elements:
+      - {fileID: 11400000, guid: 39163b2a03570dc498332e91a8fe3295, type: 2}
+      debugEnabled: 0
+      debugCollectionUpdated: 1
+      debugElementAdded: 1
+      debugElementRemoved: 1
+    variable: {fileID: 0}
+    _usesTemporaryVariable: 0
+    debugEnabled: 0
+    debugLogAll: 1
+    debugVariableReplacements: 1
+    debugFailedVariableReplacements: 0
+    debugChanges: 1
+  formatType: 0
+--- !u!114 &1535929433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1535929428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4684850230b58c149a32329c635b3423, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settings:
+    setOnAwake:
+      useConstant: 1
+      constantValue: 1
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnStart:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnEnable:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnUpdate:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnLateUpdate:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnValidate:
+      useConstant: 1
+      constantValue: 1
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnReplaceVariable:
+      useConstant: 1
+      constantValue: 1
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setOnValueChanged:
+      useConstant: 1
+      constantValue: 1
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    setInEditMode:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+    debugEnabled:
+      useConstant: 1
+      constantValue: 0
+      variable: {fileID: 0}
+      _usesTemporaryVariable: 0
+      debugEnabled: 0
+      debugLogAll: 1
+      debugVariableReplacements: 1
+      debugFailedVariableReplacements: 0
+      debugChanges: 1
+  text: {fileID: 0}
+  value:
+    useConstant: 1
+    constantValue: 20
+    variable: {fileID: 0}
+    _usesTemporaryVariable: 0
+    debugEnabled: 0
+    debugLogAll: 1
+    debugVariableReplacements: 1
+    debugFailedVariableReplacements: 0
+    debugChanges: 1
 --- !u!1 &1537287126
 GameObject:
   m_ObjectHideFlags: 0
@@ -22164,6 +22601,17 @@ PrefabInstance:
       propertyPath: unitSpawnParent
       value: 
       objectReference: {fileID: 1593076162}
+    - target: {fileID: 1264532562070036865, guid: fa085e146b7813445a9859670e1bf9d8,
+        type: 3}
+      propertyPath: turnTimeSeconds.useConstant
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1264532562070036865, guid: fa085e146b7813445a9859670e1bf9d8,
+        type: 3}
+      propertyPath: turnTimeSeconds.variable
+      value: 
+      objectReference: {fileID: 11400000, guid: 39163b2a03570dc498332e91a8fe3295,
+        type: 2}
     - target: {fileID: 1264532562070036870, guid: fa085e146b7813445a9859670e1bf9d8,
         type: 3}
       propertyPath: m_LocalPosition.x

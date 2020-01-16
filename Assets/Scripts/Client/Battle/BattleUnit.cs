@@ -112,24 +112,24 @@ namespace BattleBlast
 
 
 		#region Order direction arrow
-		public void ShowOrderArrow(BoardTile target)
+		public void ShowOrderArrow(int x, int y)
 		{
-			if (target.x > tile.x)
+			if (x > tile.x)
 			{
 				ShowOrderArrow(MoveDirection.Right);
 				return;
 			}
-			if (target.x < tile.x)
+			if (x < tile.x)
 			{
 				ShowOrderArrow(MoveDirection.Left);
 				return;
 			}
-			if (target.y > tile.y)
+			if (y > tile.y)
 			{
 				ShowOrderArrow(MoveDirection.Down);
 				return;
 			}
-			if (target.y < tile.y)
+			if (y < tile.y)
 			{
 				ShowOrderArrow(MoveDirection.Up);
 				return;

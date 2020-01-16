@@ -20,5 +20,19 @@ namespace BattleBlast
 		public int y;
 
 		public MoveDirection direction = MoveDirection.None;
+
+		public UnitInstanceData Clone()
+		{
+			return new UnitInstanceData()
+			{
+				unitInstanceId = unitInstanceId,
+				baseUnitId = baseUnitId,
+				playerId = playerId,
+				attack = attack,
+				count = count,
+				x = x,
+				y = y
+			};
+		}
 	}
 }

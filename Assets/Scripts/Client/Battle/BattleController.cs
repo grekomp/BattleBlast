@@ -141,6 +141,8 @@ namespace BattleBlast
 			Log.Info(LogTag, "Starting planning phase.", this);
 			enableTimerDisplay.Value = true;
 
+			StartCoroutine(StartTurnTimer());
+
 			//throw new NotImplementedException();
 		}
 		private void StartActionPhase()
@@ -213,6 +215,11 @@ namespace BattleBlast
 
 
 		#region Handling input
+		public void EndTurn()
+		{
+
+		}
+
 		public void HandleBattleUnitLeftClicked(BattleUnit battleUnit)
 		{
 			selectedUnit?.Deselect();
@@ -225,7 +232,10 @@ namespace BattleBlast
 		}
 		public void HandleBattleUnitRightClicked(BattleUnit battleUnit)
 		{
-			throw new NotImplementedException();
+			if (battleUnit.isFriendlyUnit == false)
+			{
+				SendUnitOrderMove(battleUnit.tile.x, battleUnit.tile.y);
+			}
 		}
 
 		public void HandleBoardTileLeftClicked(BoardTile tile)
@@ -234,27 +244,32 @@ namespace BattleBlast
 			selectedUnit = null;
 		}
 
-		public async void HandleBoardTileRightClicked(BoardTile tile)
+		public void HandleBoardTileRightClicked(BoardTile tile)
 		{
 			if (selectedUnit)
 			{
-				UnitOrderMove order = new UnitOrderMove(battleData.id, selectedUnit.unitInstanceId, tile.x, tile.y);
+				SendUnitOrderMove(tile.x, tile.y);
+			}
+		}
 
-				var request = NetRequest.CreateAndSend(NetClient.Instance.connection, order);
-				var response = await request.WaitForResponse();
-				if (response.error == null)
+		private async void SendUnitOrderMove(int x, int y)
+		{
+			UnitOrderMove order = new UnitOrderMove(battleData.id, selectedUnit.unitInstanceId, x, y);
+
+			var request = NetRequest.CreateAndSend(NetClient.Instance.connection, order);
+			var response = await request.WaitForResponse();
+			if (response.error == null)
+			{
+				if (response.GetDataOrDefault<bool>())
 				{
-					if (response.GetDataOrDefault<bool>())
-					{
-						selectedUnit.ShowOrderArrow(tile);
-					}
+					selectedUnit.ShowOrderArrow(x, y);
 				}
 			}
 		}
 
 		public IEnumerator StartTurnTimer()
 		{
-			while (turnEndTime < DateTime.Now)
+			while (turnEndTime > DateTime.Now)
 			{
 				yield return new WaitForSecondsRealtime(1);
 				CalculateCurrentTurnTimerValues();
@@ -266,7 +281,7 @@ namespace BattleBlast
 
 		private void CalculateCurrentTurnTimerValues()
 		{
-			turnNormalizedTime.Value = (DateTime.Now - turnStartTime).TotalMilliseconds / (turnEndTime - turnStartTime).TotalMilliseconds;
+			turnNormalizedTime.Value = 1.0 - ((DateTime.Now - turnStartTime).TotalMilliseconds / (turnEndTime - turnStartTime).TotalMilliseconds);
 			turnTimeSeconds.Value = (int)(turnEndTime - DateTime.Now).TotalSeconds;
 		}
 		#endregion

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1264532562070036870}
   - component: {fileID: 1264532562070036865}
+  - component: {fileID: 6210538400869007730}
   m_Layer: 0
   m_Name: BattleController
   m_TagString: Untagged
@@ -46,8 +47,72 @@ MonoBehaviour:
   board: {fileID: 0}
   battleUnitPrefab: {fileID: 5047247499562170387, guid: e1b8df3ee6814fa42b6da373781b8634,
     type: 3}
+  unitSpawnParent: {fileID: 0}
   battleData:
     id: 
     unitsOnBoard: []
   selectedUnit: {fileID: 0}
+  turnTimeSeconds:
+    useConstant: 1
+    constantValue: 0
+    variable: {fileID: 0}
+    _usesTemporaryVariable: 0
+    debugEnabled: 0
+    debugLogAll: 1
+    debugVariableReplacements: 1
+    debugFailedVariableReplacements: 0
+    debugChanges: 1
+  turnNormalizedTime:
+    useConstant: 1
+    constantValue: 0
+    variable: {fileID: 0}
+    _usesTemporaryVariable: 0
+    debugEnabled: 0
+    debugLogAll: 1
+    debugVariableReplacements: 1
+    debugFailedVariableReplacements: 0
+    debugChanges: 1
+  enableTimerDisplay:
+    useConstant: 0
+    constantValue: 0
+    variable: {fileID: 11400000, guid: 77b50cc6184fd67498981f80e58a4c9f, type: 2}
+    _usesTemporaryVariable: 0
+    debugEnabled: 0
+    debugLogAll: 1
+    debugVariableReplacements: 1
+    debugFailedVariableReplacements: 0
+    debugChanges: 1
   spawnedUnits: []
+--- !u!114 &6210538400869007730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1264532562070036864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 884af027628698c41abe778341551f7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent:
+    inspectedEvent: {fileID: 11400000, guid: 18b1a68369bdc9d4ebc41e8a20b33a1c, type: 2}
+  enableInEditor: 1
+  debug: 0
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1264532562070036865}
+        m_MethodName: EndTurn
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  responseWithData:
+    m_PersistentCalls:
+      m_Calls: []

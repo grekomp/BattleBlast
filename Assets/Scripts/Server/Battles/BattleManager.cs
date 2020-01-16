@@ -25,16 +25,10 @@ namespace BattleBlast
 		public GameEventHandler startTestBattleEvent = new GameEventHandler();
 
 
-		protected DataHandler unitOrderMoveHandler;
-
-
 		#region Initialization
 		protected override void OnInitialize()
 		{
 			base.OnInitialize();
-
-			unitOrderMoveHandler = DataHandler.New(HandleUnitOrderMove, new NetDataFilterType(typeof(UnitOrderMove)));
-			NetDataEventManager.Instance.RegisterHandler(unitOrderMoveHandler);
 
 			startTestBattleEvent.RegisterListenerOnce(StartTestBattle);
 		}
@@ -60,7 +54,6 @@ namespace BattleBlast
 		{
 			base.Dispose();
 
-			NetDataEventManager.Instance.DeregisterHandler(unitOrderMoveHandler);
 			startTestBattleEvent.DeregisterListener(StartTestBattle);
 		}
 		#endregion
@@ -83,7 +76,11 @@ namespace BattleBlast
 			ConnectedClient player02 = NetServer.Instance.Systems.ClientManager.ConnectedClients[1];
 
 			BattleData battle = CreateBattleFor(player01.PlayerData, player02.PlayerData, new BattleCreationData());
-			battle.unitsOnBoard = new List<UnitInstanceData>(testBattleUnits);
+			battle.unitsOnBoard = new List<UnitInstanceData>();
+			foreach (var unit in testBattleUnits)
+			{
+				battle.unitsOnBoard.Add(unit.Clone());
+			}
 
 			bool result = await StartBattle(battle);
 			if (result)
@@ -93,17 +90,6 @@ namespace BattleBlast
 			else
 			{
 				Log.Warning(LogTag, "Failed to start test battle.", this);
-			}
-		}
-		#endregion
-
-
-		#region Validating orders
-		public void HandleUnitOrderMove(NetReceivedData netReceivedData)
-		{
-			if (netReceivedData.data is UnitOrderMove unitOrderMove)
-			{
-				netReceivedData.SendResponse(true);
 			}
 		}
 		#endregion
