@@ -127,7 +127,14 @@ namespace BattleBlast.Server
 
 		protected bool IsValidOrder(UnitOrderMove unitOrderMove)
 		{
-			throw new NotImplementedException();
+			UnitInstanceData unit = GetUnitInstanceData(unitOrderMove.unitInstanceId);
+
+			if (Math.Abs(unit.x - unitOrderMove.targetX) + Math.Abs(unit.y - unitOrderMove.targetY) == 1)
+			{
+				return true;
+			}
+
+			return false;
 		}
 		#endregion
 
