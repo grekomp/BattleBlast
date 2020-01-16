@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace BattleBlast
 {
 	[Serializable]
-	public class LoadBattleRequestData
+	public class UnitAction
 	{
-		public BattleData battle;
+		public string unitInstanceId;
 	}
 }

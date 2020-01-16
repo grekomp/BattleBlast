@@ -40,6 +40,7 @@ namespace BattleBlast
 		[SerializeField] [Disabled] protected ClientState state;
 		[SerializeField] [Disabled] protected NetHost host;
 		public NetConnection connection;
+		public BoolReference isConnected = new BoolReference();
 
 		[SerializeField] [Disabled] protected string authToken = "";
 		[SerializeField] [Disabled] protected string playerId = "";
@@ -47,7 +48,6 @@ namespace BattleBlast
 
 		#region Public properties
 		public ClientState State => state;
-		public bool IsConnected => connection != null;
 		public string AuthToken => authToken;
 		public string PlayerId => playerId;
 		public NetHost Host => host;
@@ -73,10 +73,10 @@ namespace BattleBlast
 			if (NetCore.InstanceExists == false) return;
 
 			// Deregister event listeners
-			NetCore.Instance.OnConnectEvent.DeregisterListener(HandleConnect);
-			NetCore.Instance.OnDisconnectEvent.DeregisterListener(HandleDisconnect);
-			NetCore.Instance.OnDataReceivedEvent.DeregisterListener(HandleDataReceived);
-			NetCore.Instance.OnBroadcastEvent.DeregisterListener(HandleBroadcastEvent);
+			//NetCore.Instance.OnConnectEvent.DeregisterListener(HandleConnect);
+			//NetCore.Instance.OnDisconnectEvent.DeregisterListener(HandleDisconnect);
+			//NetCore.Instance.OnDataReceivedEvent.DeregisterListener(HandleDataReceived);
+			//NetCore.Instance.OnBroadcastEvent.DeregisterListener(HandleBroadcastEvent);
 		}
 		#endregion
 
@@ -91,7 +91,7 @@ namespace BattleBlast
 		/// <returns></returns>
 		public async void TryConnectToServer()
 		{
-			if (IsConnected) return;
+			if (isConnected) return;
 
 			Log.Info(LogTag, "Trying to connect to server...", this);
 
@@ -117,7 +117,7 @@ namespace BattleBlast
 		}
 		public async Task<bool> ConnectToServer(CancellationToken cancellationToken)
 		{
-			if (IsConnected) return true;
+			if (isConnected) return true;
 
 			// Start looking for server
 			state = ClientState.LookingForServer;
@@ -134,6 +134,7 @@ namespace BattleBlast
 					connection.OnDataEvent.RegisterListenerOnce(HandleDataReceived);
 
 					state = ClientState.Connected;
+					HandleConnect();
 					return true;
 				}
 				else
@@ -152,7 +153,7 @@ namespace BattleBlast
 		[ContextMenu(nameof(DisconnectFromServer))]
 		public void DisconnectFromServer()
 		{
-			if (IsConnected == false) return;
+			if (isConnected == false) return;
 
 			Log.Info(LogTag, "Disconnecting from server...", this);
 			connection.Disconnect();
@@ -183,7 +184,7 @@ namespace BattleBlast
 		#region MyRegion
 		public async Task<bool> TryAuthenticate(Credentials credentials)
 		{
-			if (IsConnected == false) return false;
+			if (isConnected == false) return false;
 
 			Log.Info(LogTag, $"Attempting to authenticate player. Username: {credentials.username}.");
 			NetReceivedData response = await NetRequest.CreateAndSend(connection, credentials).WaitForResponse();
@@ -223,7 +224,7 @@ namespace BattleBlast
 		/// <returns>Whether the operation succeeded.</returns>
 		public bool SendData(object serializableData, int channel = Channel.ReliableSequenced)
 		{
-			if (IsConnected == false) return false;
+			if (isConnected == false) return false;
 
 			var result = connection.Send(serializableData, channel);
 			if (result == UnityEngine.Networking.NetworkError.Ok)
@@ -244,10 +245,12 @@ namespace BattleBlast
 		#region Handling Events
 		protected void HandleConnect()
 		{
+			isConnected.Value = true;
 			OnConnect?.Raise(this);
 		}
 		protected void HandleDisconnect()
 		{
+			isConnected.Value = false;
 			state = ClientState.NotConnected;
 			authToken = null;
 			playerId = null;

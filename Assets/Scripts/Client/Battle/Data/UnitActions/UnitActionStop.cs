@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace BattleBlast
 {
 	[Serializable]
-	public class LoadBattleRequestData
+	public class UnitActionStop : UnitAction
 	{
-		public BattleData battle;
+
 	}
 }

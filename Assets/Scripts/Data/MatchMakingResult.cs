@@ -26,7 +26,7 @@ namespace BattleBlast
 
 		public Status status;
 
-		public MatchMakingResult(PlayerData player1, PlayerData player2, Battle battle, Status status)
+		public MatchMakingResult(PlayerData player1, PlayerData player2, BattleData battle, Status status)
 		{
 			this.player1 = player1;
 			this.player2 = player2;

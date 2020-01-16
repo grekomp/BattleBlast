@@ -16,7 +16,6 @@ namespace BattleBlast
 		public async void TryAuthenticatePlayer()
 		{
 			bool result = await NetClient.Instance.TryAuthenticate(credentials);
-			Log.D(result);
 		}
 	}
 }

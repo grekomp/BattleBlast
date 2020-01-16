@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace BattleBlast
 {
-	[Serializable]
-	public class LoadBattleRequestData
+	public class UnitActionSetState : UnitAction
 	{
-		public BattleData battle;
+		public int attack;
+		public int count;
+
+		public int x;
+		public int y;
 	}
 }

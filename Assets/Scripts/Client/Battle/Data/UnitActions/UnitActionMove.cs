@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 namespace BattleBlast
 {
 	[Serializable]
-	public class LoadBattleRequestData
+	public class UnitActionMove : UnitAction
 	{
-		public BattleData battle;
+		public int fromX;
+		public int fromY;
+		public int toX;
+		public int toY;
 	}
 }

@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace BattleBlast
 {
-	[Serializable]
-	public class LoadBattleRequestData
+	public enum BattlePhase
 	{
-		public BattleData battle;
+		NotStarted,
+		Starting,
+		PlanningPhase,
+		ActionPhase,
+		BattleEnded
 	}
 }

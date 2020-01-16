@@ -2,6 +2,7 @@
 using Networking;
 using ScriptableSystems;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using Utils;
@@ -14,9 +15,14 @@ namespace BattleBlast
 		public readonly static string LogTag = nameof(BattleManager);
 		public static BattleManager Instance => NetServer.Instance.Systems.BattleManager;
 
+		[Header("Runtime variables")]
+		public List<BattleSession> battleSessions = new List<BattleSession>();
 
 		[Header("Handled events")]
 		public GameEventHandler startTestBattleEvent = new GameEventHandler();
+
+
+		protected DataHandler unitOrderMoveHandler;
 
 
 		#region Initialization
@@ -24,33 +30,25 @@ namespace BattleBlast
 		{
 			base.OnInitialize();
 
+			unitOrderMoveHandler = DataHandler.New(HandleUnitOrderMove, new NetDataFilterType(typeof(UnitOrderMove)));
+			NetDataEventManager.Instance.RegisterHandler(unitOrderMoveHandler);
+
 			startTestBattleEvent.RegisterListenerOnce(StartTestBattle);
 		}
 		#endregion
 
 
 		#region Creating battles
-		public Battle CreateBattleFor(PlayerData player1, PlayerData player2, BattleCreationData battleCreationData)
+		public BattleData CreateBattleFor(PlayerData player1, PlayerData player2, BattleCreationData battleCreationData)
 		{
-			return new Battle(player1, player2, battleCreationData);
+			return new BattleData(player1, player2, battleCreationData);
 		}
 
-		public async Task<bool> StartBattle(Battle battle)
+		public async Task<bool> StartBattle(BattleData battle)
 		{
-			ConnectedClient player01 = ServerClientManager.Instance.GetClientForPlayer(battle.Player1);
-			ConnectedClient player02 = ServerClientManager.Instance.GetClientForPlayer(battle.Player2);
+			BattleSession battleSession = BattleSession.New(battle);
+			return true;
 
-			LoadBattleRequestData loadBattleRequestData = new LoadBattleRequestData() { battle = battle };
-
-			NetRequest request1 = NetRequest.CreateAndSend(player01.Connection, loadBattleRequestData);
-			NetRequest request2 = NetRequest.CreateAndSend(player01.Connection, loadBattleRequestData);
-
-			await Task.WhenAll(request1.WaitForResponse(), request2.WaitForResponse());
-
-			bool player01Loaded = request1.response.GetDataOrDefault<bool>();
-			bool player02Loaded = request2.response.GetDataOrDefault<bool>();
-
-			return player01Loaded && player02Loaded;
 		}
 		#endregion
 
@@ -60,6 +58,7 @@ namespace BattleBlast
 		{
 			base.Dispose();
 
+			NetDataEventManager.Instance.DeregisterHandler(unitOrderMoveHandler);
 			startTestBattleEvent.DeregisterListener(StartTestBattle);
 		}
 		#endregion
@@ -89,6 +88,17 @@ namespace BattleBlast
 			else
 			{
 				Log.Warning(LogTag, "Failed to start test battle.", this);
+			}
+		}
+		#endregion
+
+
+		#region Validating orders
+		public void HandleUnitOrderMove(NetReceivedData netReceivedData)
+		{
+			if (netReceivedData.data is UnitOrderMove unitOrderMove)
+			{
+				netReceivedData.SendResponse(true);
 			}
 		}
 		#endregion
