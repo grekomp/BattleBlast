@@ -25,11 +25,14 @@ namespace BattleBlast
 
 
 		#region Initialize
-		public void Initialize(UnitData unitData, string id)
+		public void Initialize(UnitInstanceData unitInstanceData)
 		{
-			unitInstanceId = id;
-			attack.Value = unitData.maxAttack;
-			count.Value = unitData.count;
+			unitInstanceId = unitInstanceData.unitInstanceId;
+			attack.Value = unitInstanceData.attack;
+			count.Value = unitInstanceData.count;
+
+			tile = BattleController.Instance.board[unitInstanceData.x, unitInstanceData.y];
+			transform.position = tile.centerTransform.position;
 		}
 		#endregion
 

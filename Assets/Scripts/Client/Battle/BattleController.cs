@@ -5,17 +5,102 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Utils;
 
 namespace BattleBlast
 {
 	public class BattleController : DontDestroySingleton<BattleController>
 	{
+		public static readonly string LogTag = nameof(BattleController);
+
+
 		[Header("Battle controller settings")]
 		public BoardController board;
+		public BattleUnit battleUnitPrefab;
 
 		[Header("Runtime variables")]
 		public BattleData battleData;
 		public BattleUnit selectedUnit;
+
+		public List<BattleUnit> spawnedUnits = new List<BattleUnit>();
+
+		protected DataHandler loadBattleRequestDataHandler;
+
+		#region Initialization
+		protected override void Start()
+		{
+			base.Start();
+
+			loadBattleRequestDataHandler = DataHandler.New(HandleLoadBattleRequest, new NetDataFilterType(typeof(LoadBattleRequestData)));
+			NetDataEventManager.Instance.RegisterHandler(loadBattleRequestDataHandler);
+		}
+		#endregion
+
+
+		#region Handling battle commands
+		public void HandleLoadBattleRequest(NetReceivedData receivedData)
+		{
+			LoadBattleRequestData loadBattleRequest = receivedData.data as LoadBattleRequestData;
+			battleData = loadBattleRequest.battle;
+
+			ClearSpawnedUnits();
+
+			foreach (var unitInstanceData in battleData.unitsOnBoard)
+			{
+				SpawnUnitFor(unitInstanceData);
+			}
+
+			receivedData.SendResponse(true);
+		}
+		public void HandleBattleCommandStartPlanningPhase(NetReceivedData receivedData)
+		{
+			if (receivedData.data is BattleCommandStartPlanningPhase battleCommandStartPlanningPhase)
+			{
+				StartPlanningPhase();
+				receivedData.SendResponse(true);
+			}
+		}
+		public void HandleBattleCommandStartActionPhase(NetReceivedData receivedData)
+		{
+			if (receivedData.data is BattleCommandStartActionPhase battleCommandStartActionPhase)
+			{
+				StartActionPhase();
+				receivedData.SendResponse(true);
+			}
+		}
+		#endregion
+
+
+		#region Managing units
+		private void SpawnUnitFor(UnitInstanceData unitInstanceData)
+		{
+			BattleUnit battleUnit = Instantiate(battleUnitPrefab, transform);
+			battleUnit.Initialize(unitInstanceData);
+		}
+
+		private void ClearSpawnedUnits()
+		{
+			foreach (var unit in spawnedUnits)
+			{
+				if (unit) Destroy(unit);
+			}
+			spawnedUnits.Clear();
+		}
+		#endregion
+
+
+		#region Managing flow
+		private void StartPlanningPhase()
+		{
+			Log.Info(LogTag, "Starting planning phase.", this);
+			//throw new NotImplementedException();
+		}
+		private void StartActionPhase()
+		{
+			Log.Info(LogTag, "Starting action phase.", this);
+			//throw new NotImplementedException();
+		}
+		#endregion
 
 
 		#region Handling input

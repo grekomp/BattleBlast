@@ -15,8 +15,11 @@ namespace BattleBlast
 		public readonly static string LogTag = nameof(BattleManager);
 		public static BattleManager Instance => NetServer.Instance.Systems.BattleManager;
 
+		public List<UnitInstanceData> testBattleUnits = new List<UnitInstanceData>();
+
 		[Header("Runtime variables")]
 		public List<BattleSession> battleSessions = new List<BattleSession>();
+
 
 		[Header("Handled events")]
 		public GameEventHandler startTestBattleEvent = new GameEventHandler();
@@ -48,7 +51,6 @@ namespace BattleBlast
 		{
 			BattleSession battleSession = BattleSession.New(battle);
 			return true;
-
 		}
 		#endregion
 
@@ -80,7 +82,10 @@ namespace BattleBlast
 			ConnectedClient player01 = NetServer.Instance.Systems.ClientManager.ConnectedClients[0];
 			ConnectedClient player02 = NetServer.Instance.Systems.ClientManager.ConnectedClients[1];
 
-			bool result = await StartBattle(CreateBattleFor(player01.PlayerData, player02.PlayerData, new BattleCreationData()));
+			BattleData battle = CreateBattleFor(player01.PlayerData, player02.PlayerData, new BattleCreationData());
+			battle.unitsOnBoard = testBattleUnits;
+
+			bool result = await StartBattle(battle);
 			if (result)
 			{
 				Log.Info(LogTag, "Test Battle started successfully.", this);
