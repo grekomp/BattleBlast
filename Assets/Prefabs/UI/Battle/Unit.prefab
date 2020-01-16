@@ -165,7 +165,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementAnimationSpeed:
     useConstant: 1
-    constantValue: 1
+    constantValue: 10
     variable: {fileID: 0}
     _usesTemporaryVariable: 0
     debugEnabled: 0
