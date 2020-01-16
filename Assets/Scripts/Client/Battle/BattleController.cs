@@ -25,6 +25,8 @@ namespace BattleBlast
 		public List<BattleUnit> spawnedUnits = new List<BattleUnit>();
 
 		protected DataHandler loadBattleRequestDataHandler;
+		protected DataHandler battleCommandStartPlanningPhaseHandler;
+		protected DataHandler battleCommandStartActionPhaseHandler;
 
 		#region Initialization
 		protected override void Start()
@@ -32,7 +34,11 @@ namespace BattleBlast
 			base.Start();
 
 			loadBattleRequestDataHandler = DataHandler.New(HandleLoadBattleRequest, new NetDataFilterType(typeof(LoadBattleRequestData)));
+			battleCommandStartPlanningPhaseHandler = DataHandler.New(HandleBattleCommandStartPlanningPhase, new NetDataFilterType(typeof(BattleCommandStartPlanningPhase)));
+			battleCommandStartActionPhaseHandler = DataHandler.New(HandleBattleCommandStartActionPhase, new NetDataFilterType(typeof(BattleCommandStartActionPhase)));
 			NetDataEventManager.Instance.RegisterHandler(loadBattleRequestDataHandler);
+			NetDataEventManager.Instance.RegisterHandler(battleCommandStartPlanningPhaseHandler);
+			NetDataEventManager.Instance.RegisterHandler(battleCommandStartActionPhaseHandler);
 		}
 		#endregion
 
