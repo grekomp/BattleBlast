@@ -24,6 +24,7 @@ namespace BattleBlast
 		public BattleData battleData;
 		public BattleUnit selectedUnit;
 
+		public BattlePhase battlePhase;
 		public DateTime turnStartTime;
 		public DateTime turnEndTime;
 		public IntReference turnTimeSeconds;
@@ -139,6 +140,7 @@ namespace BattleBlast
 		private void StartPlanningPhase()
 		{
 			Log.Info(LogTag, "Starting planning phase.", this);
+			battlePhase = BattlePhase.PlanningPhase;
 			enableTimerDisplay.Value = true;
 
 			StartCoroutine(StartTurnTimer());
@@ -148,6 +150,7 @@ namespace BattleBlast
 		private void StartActionPhase()
 		{
 			Log.Info(LogTag, "Starting action phase.", this);
+			battlePhase = BattlePhase.ActionPhase;
 			enableTimerDisplay.Value = false;
 			//throw new NotImplementedException();
 		}
@@ -235,6 +238,8 @@ namespace BattleBlast
 		}
 		public void HandleBattleUnitRightClicked(BattleUnit battleUnit)
 		{
+			if (battlePhase != BattlePhase.PlanningPhase) return;
+
 			if (battleUnit.isFriendlyUnit == false)
 			{
 				SendUnitOrderMove(battleUnit.tile.x, battleUnit.tile.y);

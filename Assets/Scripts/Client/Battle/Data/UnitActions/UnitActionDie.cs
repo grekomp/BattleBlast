@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BattleBlast
 {
+	[Serializable]
 	public class UnitActionDie : UnitAction
 	{
 		public UnitActionDie(string unitInstanceId, int timingOrder) : base(unitInstanceId, timingOrder) { }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BattleBlast
 {
+	[Serializable]
 	public class UnitActionSetState : UnitAction
 	{
 		public int attack;
