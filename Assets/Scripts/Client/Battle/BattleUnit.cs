@@ -19,7 +19,7 @@ namespace BattleBlast
 		public IntReference attack = new IntReference();
 		public IntReference count = new IntReference();
 		public string playerId;
-
+		public BoolReference isFriendlyUnit = new BoolReference();
 
 		protected Coroutine movementCoroutine;
 
@@ -30,6 +30,8 @@ namespace BattleBlast
 			unitInstanceId = unitInstanceData.unitInstanceId;
 			attack.Value = unitInstanceData.attack;
 			count.Value = unitInstanceData.count;
+			playerId = unitInstanceData.playerId;
+			isFriendlyUnit.Value = playerId == NetClient.Instance.PlayerId;
 
 			tile = BattleController.Instance.board[unitInstanceData.x, unitInstanceData.y];
 			transform.position = tile.centerTransform.position;
