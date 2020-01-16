@@ -128,6 +128,7 @@ namespace BattleBlast.Server
 		protected bool IsValidOrder(UnitOrderMove unitOrderMove)
 		{
 			UnitInstanceData unit = GetUnitInstanceData(unitOrderMove.unitInstanceId);
+			if (unit == null) return false;
 
 			if (Math.Abs(unit.x - unitOrderMove.targetX) + Math.Abs(unit.y - unitOrderMove.targetY) == 1)
 			{
@@ -159,11 +160,13 @@ namespace BattleBlast.Server
 		{
 			foreach (var stopOrder in new List<UnitOrder>(orders).FindAll(o => o is UnitOrderStop))
 			{
-				UnitInstanceData unitInstanceData = GetUnitInstanceData(stopOrder.unitInstanceId);
-				unitInstanceData.direction = MoveDirection.None;
+				orders.Remove(stopOrder);
+				UnitInstanceData unit = GetUnitInstanceData(stopOrder.unitInstanceId);
+				if (unit == null) return;
+
+				unit.direction = MoveDirection.None;
 
 				actions.Add(new UnitActionStop(stopOrder.unitInstanceId, timingOrder));
-				orders.Remove(stopOrder);
 			}
 		}
 		protected void ExecuteMoveOrders(ref List<UnitAction> actions, ref List<UnitOrderMove> remainingOrders)
@@ -233,6 +236,8 @@ namespace BattleBlast.Server
 		protected void ExecuteOrder(UnitOrderMove order, List<UnitAction> actions)
 		{
 			UnitInstanceData unit = GetUnitInstanceData(order.unitInstanceId);
+			if (unit == null) return;
+
 			UnitInstanceData target = GetOrderTargetUnit(order);
 
 			int xOffset = order.targetX - unit.x;
@@ -286,6 +291,7 @@ namespace BattleBlast.Server
 		protected bool IsConflictingOrder(UnitOrderMove order, List<UnitOrderMove> remainingOrders)
 		{
 			UnitInstanceData unit = GetUnitInstanceData(order.unitInstanceId);
+			if (unit == null) return false;
 			UnitInstanceData target = GetOrderTargetUnit(order);
 
 			if (target != null && target.playerId == unit.playerId) return true;
