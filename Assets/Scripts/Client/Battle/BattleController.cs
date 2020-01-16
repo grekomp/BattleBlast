@@ -1,5 +1,6 @@
 ﻿using Networking;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,12 @@ namespace BattleBlast
 		[Header("Runtime variables")]
 		public BattleData battleData;
 		public BattleUnit selectedUnit;
+
+		public DateTime turnStartTime;
+		public DateTime turnEndTime;
+		public IntReference turnTimeSeconds;
+		public DoubleReference turnNormalizedTime;
+		public BoolReference enableTimerDisplay;
 
 		public List<BattleUnit> spawnedUnits = new List<BattleUnit>();
 
@@ -83,6 +90,12 @@ namespace BattleBlast
 		{
 			if (receivedData.data is BattleCommandStartPlanningPhase battleCommandStartPlanningPhase)
 			{
+				turnStartTime = DateTime.Now;
+				turnEndTime = DateTime.Now.AddMilliseconds(battleCommandStartPlanningPhase.phaseTime);
+
+				CalculateCurrentTurnTimerValues();
+				enableTimerDisplay.Value = true;
+
 				StartPlanningPhase();
 				receivedData.SendResponse(true);
 			}
@@ -126,11 +139,14 @@ namespace BattleBlast
 		private void StartPlanningPhase()
 		{
 			Log.Info(LogTag, "Starting planning phase.", this);
+			enableTimerDisplay.Value = true;
+
 			//throw new NotImplementedException();
 		}
 		private void StartActionPhase()
 		{
 			Log.Info(LogTag, "Starting action phase.", this);
+			enableTimerDisplay.Value = false;
 			//throw new NotImplementedException();
 		}
 		#endregion
@@ -234,6 +250,24 @@ namespace BattleBlast
 					}
 				}
 			}
+		}
+
+		public IEnumerator StartTurnTimer()
+		{
+			while (turnEndTime < DateTime.Now)
+			{
+				yield return new WaitForSecondsRealtime(1);
+				CalculateCurrentTurnTimerValues();
+			}
+
+			turnNormalizedTime.Value = 0;
+			turnTimeSeconds.Value = 0;
+		}
+
+		private void CalculateCurrentTurnTimerValues()
+		{
+			turnNormalizedTime.Value = (DateTime.Now - turnStartTime).TotalMilliseconds / (turnEndTime - turnStartTime).TotalMilliseconds;
+			turnTimeSeconds.Value = (int)(turnEndTime - DateTime.Now).TotalSeconds;
 		}
 		#endregion
 	}

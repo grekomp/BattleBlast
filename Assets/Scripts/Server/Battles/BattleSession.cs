@@ -349,7 +349,7 @@ namespace BattleBlast.Server
 		}
 		protected async Task SendBattleCommandStartPlannigPhase()
 		{
-			await SendBoth(new BattleCommandStartPlanningPhase() { battleId = battleData.id });
+			await SendBoth(new BattleCommandStartPlanningPhase() { battleId = battleData.id, phaseTime = turnTime });
 		}
 		protected async Task<bool> SendBoth(object serializableData)
 		{

@@ -8,5 +8,8 @@ using System.Threading.Tasks;
 namespace BattleBlast
 {
 	[Serializable]
-	public class BattleCommandStartPlanningPhase : BattleCommand { }
+	public class BattleCommandStartPlanningPhase : BattleCommand
+	{
+		public int phaseTime;
+	}
 }
