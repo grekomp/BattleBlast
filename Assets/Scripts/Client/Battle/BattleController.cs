@@ -103,6 +103,7 @@ namespace BattleBlast
 		{
 			BattleUnit battleUnit = Instantiate(battleUnitPrefab, unitSpawnParent);
 			battleUnit.Initialize(unitInstanceData);
+			spawnedUnits.Add(battleUnit);
 		}
 
 		private BattleUnit GetBattleUnit(string unitInstanceId)
