@@ -9,6 +9,6 @@ namespace BattleBlast
 	[Serializable]
 	public class UnitActionStop : UnitAction
 	{
-
+		public UnitActionStop(string unitInstanceId, int timingOrder) : base(unitInstanceId, timingOrder) { }
 	}
 }

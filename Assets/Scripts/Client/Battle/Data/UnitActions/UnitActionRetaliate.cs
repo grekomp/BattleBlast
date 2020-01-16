@@ -11,5 +11,11 @@ namespace BattleBlast
 	{
 		public string targetUnitInstanceId;
 		public int killedMen;
+
+		public UnitActionRetaliate(string unitInstanceId, int timingOrder, string targetUnitInstanceId, int killedMen) : base(unitInstanceId, timingOrder)
+		{
+			this.targetUnitInstanceId = targetUnitInstanceId;
+			this.killedMen = killedMen;
+		}
 	}
 }

@@ -18,12 +18,6 @@ namespace BattleBlast
 
 		public MoveDirection direction;
 
-		[ContextMenu("Execute move action")]
-		public void ExecuteMoveAction()
-		{
-			unit?.HandleUnitActionMove(new UnitActionMove() { fromX = unit.tile.x, fromY = unit.tile.y, toX = targetX, toY = targetY });
-		}
-
 		[ContextMenu("Show order preview arrow")]
 		public void ShowOrderPreviewArrow()
 		{

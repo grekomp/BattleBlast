@@ -10,5 +10,12 @@ namespace BattleBlast
 	public class UnitAction
 	{
 		public string unitInstanceId;
+		public int timingOrder;
+
+		public UnitAction(string unitInstanceId, int timingOrder)
+		{
+			this.unitInstanceId = unitInstanceId;
+			this.timingOrder = timingOrder;
+		}
 	}
 }

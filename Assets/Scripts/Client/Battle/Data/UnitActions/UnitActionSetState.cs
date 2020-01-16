@@ -13,5 +13,13 @@ namespace BattleBlast
 
 		public int x;
 		public int y;
+
+		public UnitActionSetState(string unitInstanceId, int timingOrder, int attack, int count, int x, int y) : base(unitInstanceId, timingOrder)
+		{
+			this.attack = attack;
+			this.count = count;
+			this.x = x;
+			this.y = y;
+		}
 	}
 }

@@ -14,6 +14,7 @@ namespace BattleBlast
 		public BoardController board;
 
 		[Header("Runtime variables")]
+		public BattleData battleData;
 		public BattleUnit selectedUnit;
 
 
@@ -43,7 +44,7 @@ namespace BattleBlast
 		{
 			if (selectedUnit)
 			{
-				UnitOrderMove order = new UnitOrderMove(selectedUnit.unitInstanceId, tile.x, tile.y);
+				UnitOrderMove order = new UnitOrderMove(battleData.id, selectedUnit.unitInstanceId, tile.x, tile.y);
 
 				var request = NetRequest.CreateAndSend(NetClient.Instance.connection, order);
 				var response = await request.WaitForResponse();
@@ -53,10 +54,7 @@ namespace BattleBlast
 					{
 						selectedUnit.ShowOrderArrow(tile);
 					}
-
 				}
-
-				selectedUnit.HandleUnitActionMove(new UnitActionMove() { toX = tile.x, toY = tile.y });
 			}
 		}
 		#endregion

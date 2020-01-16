@@ -52,8 +52,8 @@ namespace BattleBlast.Server
 			battlePhase = BattlePhase.Starting;
 
 			// Register data handlers
-			unitOrderMoveDataHandler = DataHandler.New(HandleUnitOrderMove, new NetDataFilterUnitOrder(battleData.id));
-			unitOrderStopDataHandler = DataHandler.New(HandleUnitOrderStop, new NetDataFilterUnitOrder(battleData.id));
+			unitOrderMoveDataHandler = DataHandler.New(HandleUnitOrderMove, new NetDataFilterUnitOrder(battleData.id).And(new NetDataFilterType(typeof(UnitOrderMove))));
+			unitOrderStopDataHandler = DataHandler.New(HandleUnitOrderStop, new NetDataFilterUnitOrder(battleData.id).And(new NetDataFilterType(typeof(UnitOrderStop))));
 			NetDataEventManager.Instance.RegisterHandler(unitOrderMoveDataHandler);
 			NetDataEventManager.Instance.RegisterHandler(unitOrderStopDataHandler);
 
@@ -83,6 +83,8 @@ namespace BattleBlast.Server
 
 				StartActionPhase();
 				await WaitForEndOfPhase();
+
+				if (battleData.unitsOnBoard.Count == 0) battlePhase = BattlePhase.BattleEnded;
 			}
 		}
 		#endregion
@@ -90,6 +92,7 @@ namespace BattleBlast.Server
 
 		#region Handling unit orders
 		public List<UnitOrder> orders = new List<UnitOrder>();
+		public int timingOrder = 0;
 
 		public void HandleUnitOrderMove(NetReceivedData receivedData)
 		{
@@ -132,23 +135,156 @@ namespace BattleBlast.Server
 		#region Unit actions
 		protected List<UnitAction> ExecuteOrdersAndGenerateActions()
 		{
-			List<UnitAction> actions = new List<UnitAction>();
-			List<UnitOrder> remainingOrders = new List<UnitOrder>(orders);
+			timingOrder = 0;
 
-			// Execute stop orders
-			foreach (var stopOrder in orders.FindAll(o => o is UnitOrderStop))
+			List<UnitAction> actions = new List<UnitAction>();
+			ExecuteStopOrders(actions);
+
+			List<UnitOrderMove> remainingOrders = orders.Select(o => o as UnitOrderMove).ToList();
+			ExecuteMoveOrders(ref actions, ref remainingOrders);
+
+			orders.Clear();
+
+			return actions;
+		}
+
+		protected void ExecuteStopOrders(List<UnitAction> actions)
+		{
+			foreach (var stopOrder in new List<UnitOrder>(orders).FindAll(o => o is UnitOrderStop))
 			{
 				UnitInstanceData unitInstanceData = GetUnitInstanceData(stopOrder.unitInstanceId);
 				unitInstanceData.direction = MoveDirection.None;
 
-				actions.Add(new UnitActionStop() { unitInstanceId = stopOrder.unitInstanceId });
-				remainingOrders.Remove(stopOrder);
+				actions.Add(new UnitActionStop(stopOrder.unitInstanceId, timingOrder));
+				orders.Remove(stopOrder);
+			}
+		}
+		protected void ExecuteMoveOrders(ref List<UnitAction> actions, ref List<UnitOrderMove> remainingOrders)
+		{
+			bool continueSolvingOrders = true;
+			while (continueSolvingOrders && remainingOrders.Count > 0)
+			{
+				SolveAttackOrders(remainingOrders, actions);
+
+				continueSolvingOrders = SolveUnconflictingOrders(remainingOrders, actions);
+				if (continueSolvingOrders) continue;
+
+				continueSolvingOrders = SolveRandomConflictingOrder(remainingOrders, actions);
+			}
+		}
+
+		private bool SolveRandomConflictingOrder(List<UnitOrderMove> remainingOrders, List<UnitAction> actions)
+		{
+			List<UnitOrderMove> conflictingOrders = remainingOrders.FindAll(o => IsConflictingOrder(o, remainingOrders)).ToList();
+			conflictingOrders.Shuffle();
+
+			if (conflictingOrders.Count > 0)
+			{
+				ExecuteOrder(conflictingOrders.First(), actions);
+				remainingOrders.Remove(conflictingOrders.First());
+				return true;
 			}
 
-			// Execute move orders
-			throw new NotImplementedException();
+			return false;
+		}
 
-			return actions;
+		protected void SolveAttackOrders(List<UnitOrderMove> remainingOrders, List<UnitAction> actions)
+		{
+			List<UnitOrderMove> attackOrders = new List<UnitOrderMove>();
+
+			foreach (var moveOrder in remainingOrders)
+			{
+				if (GetOrderTargetUnit(moveOrder) != null)
+				{
+					attackOrders.Add(moveOrder);
+				}
+			}
+
+			attackOrders.Shuffle();
+			foreach (var attackOrder in attackOrders)
+			{
+				ExecuteOrder(attackOrder, actions);
+			}
+		}
+
+		protected bool SolveUnconflictingOrders(List<UnitOrderMove> remainingOrders, List<UnitAction> actions)
+		{
+			bool anyOrdersSolved = false;
+
+			foreach (var moveOrder in new List<UnitOrderMove>(remainingOrders))
+			{
+				if (IsBlockedOrder(moveOrder, remainingOrders)) continue;
+				if (IsConflictingOrder(moveOrder, remainingOrders)) continue;
+
+				ExecuteOrder(moveOrder, actions);
+				remainingOrders.Remove(moveOrder);
+			}
+
+			return anyOrdersSolved;
+		}
+
+		protected void ExecuteOrder(UnitOrderMove order, List<UnitAction> actions)
+		{
+			UnitInstanceData unit = GetUnitInstanceData(order.unitInstanceId);
+			UnitInstanceData target = GetOrderTargetUnit(order);
+
+			if (unit == null) return;
+
+			if (target != null)
+			{
+				if (unit.playerId == target.playerId) return;
+
+				int killedMen = Math.Min(target.count, unit.attack);
+
+				actions.Add(new UnitActionAttack(unit.unitInstanceId, ++timingOrder, target.unitInstanceId, killedMen));
+
+				target.count -= killedMen;
+				// TODO: Recalculate attack
+
+				if (target.count <= 0)
+				{
+					actions.Add(new UnitActionDie(target.unitInstanceId, ++timingOrder));
+					battleData.unitsOnBoard.Remove(target);
+					return;
+				}
+
+				int retaliationKilledMen = Math.Min(unit.count, target.attack);
+				actions.Add(new UnitActionRetaliate(target.unitInstanceId, ++timingOrder, unit.unitInstanceId, retaliationKilledMen));
+
+				unit.count -= retaliationKilledMen;
+				// TODO: Recalculate attack
+
+				if (unit.count <= 0)
+				{
+					actions.Add(new UnitActionDie(unit.unitInstanceId, ++timingOrder));
+					battleData.unitsOnBoard.Remove(unit);
+				}
+			}
+			else
+			{
+				actions.Add(new UnitActionMove(unit.unitInstanceId, ++timingOrder, unit.x, unit.y, order.targetX, order.targetY));
+
+				unit.x = order.targetX;
+				unit.y = order.targetY;
+			}
+		}
+		protected bool IsConflictingOrder(UnitOrderMove order, List<UnitOrderMove> remainingOrders)
+		{
+			UnitInstanceData unit = GetUnitInstanceData(order.unitInstanceId);
+			UnitInstanceData target = GetOrderTargetUnit(order);
+
+			if (target != null && target.playerId == unit.playerId) return true;
+			if (remainingOrders.Find(o => o != order && o.targetX == order.targetX && o.targetY == order.targetY) != null) return true;
+
+			return false;
+		}
+		protected bool IsBlockedOrder(UnitOrderMove order, List<UnitOrderMove> remainingOrders)
+		{
+			UnitInstanceData target = GetOrderTargetUnit(order);
+
+			if (target != null) return true;
+
+			return false;
 		}
 		#endregion
 
@@ -195,10 +331,9 @@ namespace BattleBlast.Server
 				actionTasks.Add(SendBoth(action));
 			}
 
-			// Execute all orders and generate unitActions
-			// Send all actions and wait for players to finish executing them
+			await Task.WhenAll(actionTasks);
 
-			throw new NotImplementedException();
+			phaseTaskCompletionSource.TrySetResult(true);
 		}
 
 		protected async Task SendBattleCommandStartActionPhase()
@@ -221,6 +356,10 @@ namespace BattleBlast.Server
 
 
 		#region Data access helpers
+		protected UnitInstanceData GetOrderTargetUnit(UnitOrderMove moveOrder)
+		{
+			return battleData.unitsOnBoard.Find(u => u.x == moveOrder.targetX && u.y == moveOrder.targetY);
+		}
 		protected UnitInstanceData GetUnitInstanceData(string unitInstanceId)
 		{
 			return battleData.unitsOnBoard.Find(u => u.unitInstanceId == unitInstanceId);
