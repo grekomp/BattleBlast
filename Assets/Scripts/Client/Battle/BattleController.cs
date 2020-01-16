@@ -28,6 +28,12 @@ namespace BattleBlast
 		protected DataHandler loadBattleRequestDataHandler;
 		protected DataHandler battleCommandStartPlanningPhaseHandler;
 		protected DataHandler battleCommandStartActionPhaseHandler;
+		protected DataHandler unitActionMoveHandler;
+		protected DataHandler unitActionStopHandler;
+		protected DataHandler unitActionAttackHandler;
+		protected DataHandler unitActionRetaliateHandler;
+		protected DataHandler unitActionDieHandler;
+
 
 		#region Initialization
 		protected override void Start()
@@ -37,9 +43,23 @@ namespace BattleBlast
 			loadBattleRequestDataHandler = DataHandler.New(HandleLoadBattleRequest, new NetDataFilterType(typeof(LoadBattleRequestData)));
 			battleCommandStartPlanningPhaseHandler = DataHandler.New(HandleBattleCommandStartPlanningPhase, new NetDataFilterType(typeof(BattleCommandStartPlanningPhase)));
 			battleCommandStartActionPhaseHandler = DataHandler.New(HandleBattleCommandStartActionPhase, new NetDataFilterType(typeof(BattleCommandStartActionPhase)));
+
+			unitActionMoveHandler = DataHandler.New(HandleUnitActionMove, new NetDataFilterType(typeof(UnitActionMove)));
+			unitActionStopHandler = DataHandler.New(HandleUnitActionStop, new NetDataFilterType(typeof(UnitActionStop)));
+			unitActionAttackHandler = DataHandler.New(HandleUnitActionAttack, new NetDataFilterType(typeof(UnitActionAttack)));
+			unitActionRetaliateHandler = DataHandler.New(HandleUnitActionRetaliate, new NetDataFilterType(typeof(UnitActionRetaliate)));
+			unitActionDieHandler = DataHandler.New(HandleUnitActionDie, new NetDataFilterType(typeof(UnitActionDie)));
+
+
 			NetDataEventManager.Instance.RegisterHandler(loadBattleRequestDataHandler);
 			NetDataEventManager.Instance.RegisterHandler(battleCommandStartPlanningPhaseHandler);
 			NetDataEventManager.Instance.RegisterHandler(battleCommandStartActionPhaseHandler);
+
+			NetDataEventManager.Instance.RegisterHandler(unitActionMoveHandler);
+			NetDataEventManager.Instance.RegisterHandler(unitActionStopHandler);
+			NetDataEventManager.Instance.RegisterHandler(unitActionAttackHandler);
+			NetDataEventManager.Instance.RegisterHandler(unitActionRetaliateHandler);
+			NetDataEventManager.Instance.RegisterHandler(unitActionDieHandler);
 		}
 		#endregion
 
@@ -85,6 +105,11 @@ namespace BattleBlast
 			battleUnit.Initialize(unitInstanceData);
 		}
 
+		private BattleUnit GetBattleUnit(string unitInstanceId)
+		{
+			return spawnedUnits.Find(u => u.unitInstanceId == unitInstanceId);
+		}
+
 		private void ClearSpawnedUnits()
 		{
 			foreach (var unit in spawnedUnits)
@@ -106,6 +131,66 @@ namespace BattleBlast
 		{
 			Log.Info(LogTag, "Starting action phase.", this);
 			//throw new NotImplementedException();
+		}
+		#endregion
+
+
+		#region Handling unit actions
+		public void HandleUnitActionMove(NetReceivedData receivedData)
+		{
+			if (receivedData.data is UnitActionMove unitAction)
+			{
+				BattleUnit battleUnit = GetBattleUnit(unitAction.unitInstanceId);
+
+				battleUnit.HandleUnitActionMove(unitAction);
+
+				receivedData.SendResponse(true);
+			}
+		}
+
+		public void HandleUnitActionAttack(NetReceivedData receivedData)
+		{
+			if (receivedData.data is UnitActionAttack unitAction)
+			{
+				BattleUnit battleUnit = GetBattleUnit(unitAction.unitInstanceId);
+
+				battleUnit.HandleUnitActionAttack(unitAction);
+
+				receivedData.SendResponse(true);
+			}
+		}
+		public void HandleUnitActionRetaliate(NetReceivedData receivedData)
+		{
+			if (receivedData.data is UnitActionRetaliate unitAction)
+			{
+				BattleUnit battleUnit = GetBattleUnit(unitAction.unitInstanceId);
+
+				battleUnit.HandleUnitActionRetaliate(unitAction);
+
+				receivedData.SendResponse(true);
+			}
+		}
+		public void HandleUnitActionDie(NetReceivedData receivedData)
+		{
+			if (receivedData.data is UnitActionDie unitAction)
+			{
+				BattleUnit battleUnit = GetBattleUnit(unitAction.unitInstanceId);
+
+				battleUnit.HandleUnitActionDie(unitAction);
+
+				receivedData.SendResponse(true);
+			}
+		}
+		public void HandleUnitActionStop(NetReceivedData receivedData)
+		{
+			if (receivedData.data is UnitActionStop unitAction)
+			{
+				BattleUnit battleUnit = GetBattleUnit(unitAction.unitInstanceId);
+
+				battleUnit.HandleUnitActionStop(unitAction);
+
+				receivedData.SendResponse(true);
+			}
 		}
 		#endregion
 

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -87,7 +88,7 @@ namespace BattleBlast
 
 		public void HandleUnitActionStop(UnitActionStop unitAction)
 		{
-
+			HideOrderArrow();
 		}
 		public void HandleUnitActionAttack(UnitActionAttack unitAction)
 		{
@@ -101,6 +102,11 @@ namespace BattleBlast
 		{
 			attack.Value = unitAction.attack;
 			count.Value = unitAction.count;
+		}
+		public void HandleUnitActionDie(UnitActionDie unitAction)
+		{
+			BattleController.Instance.spawnedUnits.Remove(this);
+			Destroy(gameObject);
 		}
 		#endregion
 
@@ -160,6 +166,8 @@ namespace BattleBlast
 		{
 			orderPreviewArrow?.SetActive(false);
 		}
+
+
 		#endregion
 	}
 }

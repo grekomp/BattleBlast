@@ -83,7 +83,7 @@ namespace BattleBlast
 			ConnectedClient player02 = NetServer.Instance.Systems.ClientManager.ConnectedClients[1];
 
 			BattleData battle = CreateBattleFor(player01.PlayerData, player02.PlayerData, new BattleCreationData());
-			battle.unitsOnBoard = testBattleUnits;
+			battle.unitsOnBoard = new List<UnitInstanceData>(testBattleUnits);
 
 			bool result = await StartBattle(battle);
 			if (result)
