@@ -21503,6 +21503,11 @@ PrefabInstance:
       propertyPath: board
       value: 
       objectReference: {fileID: 1486643899}
+    - target: {fileID: 1264532562070036865, guid: fa085e146b7813445a9859670e1bf9d8,
+        type: 3}
+      propertyPath: unitSpawnParent
+      value: 
+      objectReference: {fileID: 1593076162}
     - target: {fileID: 1264532562070036870, guid: fa085e146b7813445a9859670e1bf9d8,
         type: 3}
       propertyPath: m_LocalPosition.x

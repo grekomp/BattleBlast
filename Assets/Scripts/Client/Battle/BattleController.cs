@@ -17,6 +17,7 @@ namespace BattleBlast
 		[Header("Battle controller settings")]
 		public BoardController board;
 		public BattleUnit battleUnitPrefab;
+		public Transform unitSpawnParent;
 
 		[Header("Runtime variables")]
 		public BattleData battleData;
@@ -80,7 +81,7 @@ namespace BattleBlast
 		#region Managing units
 		private void SpawnUnitFor(UnitInstanceData unitInstanceData)
 		{
-			BattleUnit battleUnit = Instantiate(battleUnitPrefab, transform);
+			BattleUnit battleUnit = Instantiate(battleUnitPrefab, unitSpawnParent);
 			battleUnit.Initialize(unitInstanceData);
 		}
 
