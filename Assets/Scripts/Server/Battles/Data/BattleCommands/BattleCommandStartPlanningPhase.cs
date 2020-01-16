@@ -7,5 +7,6 @@ using System.Threading.Tasks;
 
 namespace BattleBlast
 {
+	[Serializable]
 	public class BattleCommandStartPlanningPhase : BattleCommand { }
 }
