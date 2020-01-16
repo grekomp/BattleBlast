@@ -44,10 +44,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   board: {fileID: 0}
-  battleUnitPrefab: {fileID: 0}
+  battleUnitPrefab: {fileID: 5047247499562170387, guid: e1b8df3ee6814fa42b6da373781b8634,
+    type: 3}
   battleData:
     id: 
     unitsOnBoard: []
-  selectedUnit: {fileID: 5047247499562170387, guid: e1b8df3ee6814fa42b6da373781b8634,
-    type: 3}
+  selectedUnit: {fileID: 0}
   spawnedUnits: []
