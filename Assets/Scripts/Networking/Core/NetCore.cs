@@ -103,7 +103,7 @@ namespace Networking
 		{
 			if (IsInitialized == false) return;
 
-			byte[] buffer = new byte[2048];
+			byte[] buffer = new byte[8000];
 			NetworkEventType eventType;
 			do
 			{

@@ -61,8 +61,8 @@ namespace BattleBlast.Server
 			// Load players
 			LoadBattleRequestData loadBattleRequestData = new LoadBattleRequestData() { battle = battleData };
 
-			NetRequest request1 = NetRequest.CreateAndSend(player1.Connection, loadBattleRequestData);
-			NetRequest request2 = NetRequest.CreateAndSend(player2.Connection, loadBattleRequestData);
+			NetRequest request1 = NetRequest.CreateAndSend(player1.Connection, loadBattleRequestData, Channel.ReliableFragmented);
+			NetRequest request2 = NetRequest.CreateAndSend(player2.Connection, loadBattleRequestData, Channel.ReliableFragmented);
 
 			await Task.WhenAll(request1.WaitForResponse(), request2.WaitForResponse());
 
