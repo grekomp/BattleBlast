@@ -133,8 +133,9 @@ namespace BattleBlast
 			attack.Value = unitAction.attack;
 			count.Value = unitAction.count;
 		}
-		public void HandleUnitActionDie(UnitActionDie unitAction)
+		public async void HandleUnitActionDie(UnitActionDie unitAction)
 		{
+			await Task.Delay(100);
 			BattleController.Instance.spawnedUnits.Remove(this);
 			Destroy(gameObject);
 		}
