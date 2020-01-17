@@ -179,7 +179,8 @@ namespace BattleBlast
 				await battleUnit.HandleUnitActionAttack(unitAction);
 
 				BattleUnit targetUnit = GetBattleUnit(unitAction.targetUnitInstanceId);
-				targetUnit.SetCount(targetUnit.count - unitAction.killedMen);
+				targetUnit.SetCount(unitAction.targetRemainingCount);
+				targetUnit.SetAttack(unitAction.targetRecalculatedAttack);
 
 				receivedData.SendResponse(true);
 			}
@@ -191,6 +192,10 @@ namespace BattleBlast
 				BattleUnit battleUnit = GetBattleUnit(unitAction.unitInstanceId);
 
 				battleUnit.HandleUnitActionRetaliate(unitAction);
+
+				BattleUnit targetUnit = GetBattleUnit(unitAction.targetUnitInstanceId);
+				targetUnit.SetCount(unitAction.targetRemainingCount);
+				targetUnit.SetAttack(unitAction.targetRecalculatedAttack);
 
 				receivedData.SendResponse(true);
 			}

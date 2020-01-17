@@ -255,11 +255,11 @@ namespace BattleBlast.Server
 				if (unit.playerId == target.playerId) return;
 
 				int killedMen = Math.Min(target.count, unit.attack);
-
-				actions.Add(new UnitActionAttack(unit.unitInstanceId, ++timingOrder, target.unitInstanceId, killedMen));
-
 				target.count -= killedMen;
-				// TODO: Recalculate attack
+				target.RecalculateAttack();
+
+				actions.Add(new UnitActionAttack(unit.unitInstanceId, ++timingOrder, target.unitInstanceId, target.count, target.attack));
+
 
 				if (target.count <= 0)
 				{
@@ -269,10 +269,10 @@ namespace BattleBlast.Server
 				}
 
 				int retaliationKilledMen = Math.Min(unit.count, target.attack);
-				actions.Add(new UnitActionRetaliate(target.unitInstanceId, ++timingOrder, unit.unitInstanceId, retaliationKilledMen));
-
 				unit.count -= retaliationKilledMen;
-				// TODO: Recalculate attack
+				unit.RecalculateAttack();
+
+				actions.Add(new UnitActionRetaliate(target.unitInstanceId, ++timingOrder, unit.unitInstanceId, unit.count, unit.attack));
 
 				if (unit.count <= 0)
 				{

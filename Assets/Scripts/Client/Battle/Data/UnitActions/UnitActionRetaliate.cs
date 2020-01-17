@@ -10,12 +10,14 @@ namespace BattleBlast
 	public class UnitActionRetaliate : UnitAction
 	{
 		public string targetUnitInstanceId;
-		public int killedMen;
+		public int targetRemainingCount;
+		public int targetRecalculatedAttack;
 
-		public UnitActionRetaliate(string unitInstanceId, int timingOrder, string targetUnitInstanceId, int killedMen) : base(unitInstanceId, timingOrder)
+		public UnitActionRetaliate(string unitInstanceId, int timingOrder, string targetUnitInstanceId, int targetRemainingCount, int targetRecalculatedAttack) : base(unitInstanceId, timingOrder)
 		{
 			this.targetUnitInstanceId = targetUnitInstanceId;
-			this.killedMen = killedMen;
+			this.targetRemainingCount = targetRemainingCount;
+			this.targetRecalculatedAttack = targetRecalculatedAttack;
 		}
 	}
 }
