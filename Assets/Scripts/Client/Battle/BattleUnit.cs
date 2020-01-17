@@ -124,16 +124,16 @@ namespace BattleBlast
 		{
 			await Task.Delay(100);
 		}
-		public void HandleUnitActionRetaliate(UnitActionRetaliate unitAction)
+		public async Task HandleUnitActionRetaliate(UnitActionRetaliate unitAction)
 		{
-
+			await Task.Delay(100);
 		}
 		public void HandleUnitActionSetState(UnitActionSetState unitAction)
 		{
 			attack.Value = unitAction.attack;
 			count.Value = unitAction.count;
 		}
-		public async void HandleUnitActionDie(UnitActionDie unitAction)
+		public async Task HandleUnitActionDie(UnitActionDie unitAction)
 		{
 			await Task.Delay(100);
 			BattleController.Instance.spawnedUnits.Remove(this);

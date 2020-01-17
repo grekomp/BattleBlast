@@ -185,13 +185,13 @@ namespace BattleBlast
 				receivedData.SendResponse(true);
 			}
 		}
-		public void HandleUnitActionRetaliate(NetReceivedData receivedData)
+		public async void HandleUnitActionRetaliate(NetReceivedData receivedData)
 		{
 			if (receivedData.data is UnitActionRetaliate unitAction)
 			{
 				BattleUnit battleUnit = GetBattleUnit(unitAction.unitInstanceId);
 
-				battleUnit.HandleUnitActionRetaliate(unitAction);
+				await battleUnit.HandleUnitActionRetaliate(unitAction);
 
 				BattleUnit targetUnit = GetBattleUnit(unitAction.targetUnitInstanceId);
 				targetUnit?.SetCount(unitAction.targetRemainingCount);
@@ -200,7 +200,7 @@ namespace BattleBlast
 				receivedData.SendResponse(true);
 			}
 		}
-		public void HandleUnitActionDie(NetReceivedData receivedData)
+		public async void HandleUnitActionDie(NetReceivedData receivedData)
 		{
 			if (receivedData.data is UnitActionDie unitAction)
 			{
