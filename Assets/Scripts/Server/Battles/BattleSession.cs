@@ -356,13 +356,10 @@ namespace BattleBlast.Server
 			await SendBattleCommandStartActionPhase();
 
 			List<UnitAction> actions = ExecuteOrdersAndGenerateActions();
-			List<Task> actionTasks = new List<Task>();
 			foreach (var action in actions)
 			{
-				actionTasks.Add(SendBoth(action));
+				await SendBoth(action);
 			}
-
-			await Task.WhenAll(actionTasks);
 
 			phaseTaskCompletionSource.TrySetResult(true);
 		}
