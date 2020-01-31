@@ -21,7 +21,10 @@ MonoBehaviour:
     baseUnitId: 99272510-db68-469c-a4fb-735c63e91342
     playerId: 12f66001-8d6f-4e26-8e07-02eda6a7f7af
     attack: 7
+    baseAttack: 7
+    minAttack: 3
     count: 100
+    baseCount: 100
     x: 2
     y: 3
     direction: 4
@@ -29,7 +32,10 @@ MonoBehaviour:
     baseUnitId: 99272510-db68-469c-a4fb-735c63e91342
     playerId: 12f66001-8d6f-4e26-8e07-02eda6a7f7af
     attack: 7
+    baseAttack: 7
+    minAttack: 3
     count: 100
+    baseCount: 100
     x: 2
     y: 4
     direction: 4
@@ -37,7 +43,10 @@ MonoBehaviour:
     baseUnitId: 99272510-db68-469c-a4fb-735c63e91342
     playerId: 12f66001-8d6f-4e26-8e07-02eda6a7f7af
     attack: 7
+    baseAttack: 7
+    minAttack: 3
     count: 100
+    baseCount: 100
     x: 2
     y: 5
     direction: 4
@@ -45,7 +54,10 @@ MonoBehaviour:
     baseUnitId: 99272510-db68-469c-a4fb-735c63e91342
     playerId: 12f66001-8d6f-4e26-8e07-02eda6a7f7af
     attack: 7
+    baseAttack: 7
+    minAttack: 3
     count: 100
+    baseCount: 100
     x: 2
     y: 6
     direction: 4
@@ -53,7 +65,10 @@ MonoBehaviour:
     baseUnitId: 99272510-db68-469c-a4fb-735c63e91342
     playerId: 12f66001-8d6f-4e26-8e07-02eda6a7f7af
     attack: 7
+    baseAttack: 7
+    minAttack: 3
     count: 100
+    baseCount: 100
     x: 2
     y: 7
     direction: 4
@@ -61,7 +76,10 @@ MonoBehaviour:
     baseUnitId: 99272510-db68-469c-a4fb-735c63e91342
     playerId: 5d15e699-155d-4dac-b0c0-c5da1d58cf38
     attack: 7
+    baseAttack: 7
+    minAttack: 3
     count: 100
+    baseCount: 100
     x: 9
     y: 3
     direction: 4
@@ -69,7 +87,10 @@ MonoBehaviour:
     baseUnitId: 99272510-db68-469c-a4fb-735c63e91342
     playerId: 5d15e699-155d-4dac-b0c0-c5da1d58cf38
     attack: 7
+    baseAttack: 7
+    minAttack: 3
     count: 100
+    baseCount: 100
     x: 9
     y: 4
     direction: 4
@@ -77,7 +98,10 @@ MonoBehaviour:
     baseUnitId: 99272510-db68-469c-a4fb-735c63e91342
     playerId: 5d15e699-155d-4dac-b0c0-c5da1d58cf38
     attack: 7
+    baseAttack: 7
+    minAttack: 3
     count: 100
+    baseCount: 0
     x: 9
     y: 5
     direction: 4
@@ -85,7 +109,10 @@ MonoBehaviour:
     baseUnitId: 99272510-db68-469c-a4fb-735c63e91342
     playerId: 5d15e699-155d-4dac-b0c0-c5da1d58cf38
     attack: 7
+    baseAttack: 7
+    minAttack: 3
     count: 100
+    baseCount: 100
     x: 9
     y: 6
     direction: 4
@@ -93,7 +120,10 @@ MonoBehaviour:
     baseUnitId: 99272510-db68-469c-a4fb-735c63e91342
     playerId: 5d15e699-155d-4dac-b0c0-c5da1d58cf38
     attack: 7
+    baseAttack: 7
+    minAttack: 3
     count: 100
+    baseCount: 100
     x: 9
     y: 7
     direction: 4

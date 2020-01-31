@@ -21,9 +21,13 @@ namespace Utils
 	{
 		public readonly static string defaultDebugTag = "QuickDebug";
 
+		public static List<string> messages = new List<string>();
+		public static event Action OnMessagesChanged;
+
 		public static void PrintLog(LogLevel logLevel, string tag, object message, UnityEngine.Object context = null)
 		{
 			string logString = $"[{logLevel.ToString().Substring(0, 3)}] {tag}: {message}";
+			messages.Add(logString);
 
 			if (context == null)
 			{
@@ -61,6 +65,8 @@ namespace Utils
 						break;
 				}
 			}
+
+			OnMessagesChanged?.SafeInvoke();
 		}
 
 		public static void D(object message)
