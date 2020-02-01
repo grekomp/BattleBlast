@@ -41,9 +41,10 @@ namespace BattleBlast
 			return new BattleData(player1, player2, battleCreationData);
 		}
 
-		public async Task<bool> StartBattle(BattleData battle)
+		public bool StartBattle(BattleData battle)
 		{
 			BattleSession battleSession = BattleSession.New(battle);
+			var task = Task.Run(battleSession.Start);
 			return true;
 		}
 		#endregion
@@ -61,7 +62,7 @@ namespace BattleBlast
 
 		#region Debug controls
 		[ContextMenu(nameof(StartTestBattle))]
-		public async void StartTestBattle()
+		public void StartTestBattle()
 		{
 			Log.Info(LogTag, "Starting test battle...", this);
 
@@ -82,7 +83,7 @@ namespace BattleBlast
 				battle.unitsOnBoard.Add(unit.Clone());
 			}
 
-			bool result = await StartBattle(battle);
+			bool result = StartBattle(battle);
 			if (result)
 			{
 				Log.Info(LogTag, "Test Battle started successfully.", this);

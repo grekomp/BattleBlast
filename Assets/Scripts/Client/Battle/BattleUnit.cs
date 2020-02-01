@@ -97,11 +97,12 @@ namespace BattleBlast
 
 		#region Handling unit actions
 		#region Handling movement
-		public void HandleUnitActionMove(UnitActionMove unitAction)
+		public async Task HandleUnitActionMove(UnitActionMove unitAction)
 		{
 			if (movementCoroutine != null) StopCoroutine(movementCoroutine);
 			tile = BattleController.Instance.board[unitAction.toX, unitAction.toY];
 			movementCoroutine = StartCoroutine(AnimateMoveTo(tile.CenterPosition));
+			await Task.Delay(100);
 		}
 
 		protected IEnumerator AnimateMoveTo(Vector3 targetPosition)

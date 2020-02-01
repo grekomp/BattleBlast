@@ -36,7 +36,7 @@ namespace Utils
 
 			foreach (var message in Log.messages)
 			{
-				DataBundle messageDataBundle = DataBundle.New(message);
+				DataBundle messageDataBundle = DataBundle.New();
 
 				messageDataBundle.Set(messageTextDataKey, StringVariable.New(message));
 

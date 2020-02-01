@@ -36,6 +36,7 @@ namespace BattleBlast
 		protected DataHandler loadBattleRequestDataHandler;
 		protected DataHandler battleCommandStartPlanningPhaseHandler;
 		protected DataHandler battleCommandStartActionPhaseHandler;
+		protected DataHandler battleCommandExecuteUnitActionsHandler;
 		protected DataHandler unitActionMoveHandler;
 		protected DataHandler unitActionStopHandler;
 		protected DataHandler unitActionAttackHandler;
@@ -51,6 +52,7 @@ namespace BattleBlast
 			loadBattleRequestDataHandler = DataHandler.New(HandleLoadBattleRequest, new NetDataFilterType(typeof(LoadBattleRequestData)));
 			battleCommandStartPlanningPhaseHandler = DataHandler.New(HandleBattleCommandStartPlanningPhase, new NetDataFilterType(typeof(BattleCommandStartPlanningPhase)));
 			battleCommandStartActionPhaseHandler = DataHandler.New(HandleBattleCommandStartActionPhase, new NetDataFilterType(typeof(BattleCommandStartActionPhase)));
+			//	battleCommandExecuteUnitActionsHandler = DataHandler.New(HandleBattleCommandExecuteUnitActions, new NetDataFilterType(typeof(BattleCommandExecuteUnitActions)));
 
 			unitActionMoveHandler = DataHandler.New(HandleUnitActionMove, new NetDataFilterType(typeof(UnitActionMove)));
 			unitActionStopHandler = DataHandler.New(HandleUnitActionStop, new NetDataFilterType(typeof(UnitActionStop)));
@@ -62,12 +64,13 @@ namespace BattleBlast
 			NetDataEventManager.Instance.RegisterHandler(loadBattleRequestDataHandler);
 			NetDataEventManager.Instance.RegisterHandler(battleCommandStartPlanningPhaseHandler);
 			NetDataEventManager.Instance.RegisterHandler(battleCommandStartActionPhaseHandler);
+			NetDataEventManager.Instance.RegisterHandler(battleCommandExecuteUnitActionsHandler);
 
-			NetDataEventManager.Instance.RegisterHandler(unitActionMoveHandler);
-			NetDataEventManager.Instance.RegisterHandler(unitActionStopHandler);
-			NetDataEventManager.Instance.RegisterHandler(unitActionAttackHandler);
-			NetDataEventManager.Instance.RegisterHandler(unitActionRetaliateHandler);
-			NetDataEventManager.Instance.RegisterHandler(unitActionDieHandler);
+			//NetDataEventManager.Instance.RegisterHandler(unitActionMoveHandler);
+			//NetDataEventManager.Instance.RegisterHandler(unitActionStopHandler);
+			//NetDataEventManager.Instance.RegisterHandler(unitActionAttackHandler);
+			//NetDataEventManager.Instance.RegisterHandler(unitActionRetaliateHandler);
+			//NetDataEventManager.Instance.RegisterHandler(unitActionDieHandler);
 		}
 		#endregion
 
@@ -109,6 +112,19 @@ namespace BattleBlast
 				receivedData.SendResponse(true);
 			}
 		}
+		//public void HandleBattleCommandExecuteUnitActions(NetReceivedData receivedData)
+		//{
+		//	if (receivedData.data is BattleCommandExecuteUnitActions battleCommand)
+		//	{
+		//		receivedData.requestHandled = true;
+
+		//		// TODO: Handle all unit actions
+
+		//		// TODO: Await completion of all unit actions
+
+		//		receivedData.SendResponse(true);
+		//	}
+		//}
 		#endregion
 
 
@@ -158,13 +174,13 @@ namespace BattleBlast
 
 
 		#region Handling unit actions
-		public void HandleUnitActionMove(NetReceivedData receivedData)
+		public async void HandleUnitActionMove(NetReceivedData receivedData)
 		{
 			if (receivedData.data is UnitActionMove unitAction)
 			{
 				BattleUnit battleUnit = GetBattleUnit(unitAction.unitInstanceId);
 
-				battleUnit.HandleUnitActionMove(unitAction);
+				await battleUnit.HandleUnitActionMove(unitAction);
 
 				receivedData.SendResponse(true);
 			}

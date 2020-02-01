@@ -34,7 +34,7 @@ namespace Networking
 		}
 		public void HandleDataEvent(NetReceivedData receivedData)
 		{
-			List<DataHandler> validHandlersForDataType = registeredDataHandlers.FindAll(dh => dh.IsValidHandlerFor(receivedData)).ToList();
+			List<DataHandler> validHandlersForDataType = registeredDataHandlers.FindAll(dh => dh != null).FindAll(dh => dh.IsValidHandlerFor(receivedData)).ToList();
 
 			foreach (var handler in validHandlersForDataType)
 			{

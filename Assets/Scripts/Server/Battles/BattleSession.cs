@@ -43,7 +43,7 @@ namespace BattleBlast.Server
 			battleSession.battleData = battleData;
 			battleSession.player1 = ServerClientManager.Instance.GetClientForPlayer(battleData.Player1);
 			battleSession.player2 = ServerClientManager.Instance.GetClientForPlayer(battleData.Player2);
-			battleSession.Start();
+			//battleSession.Start();
 			return battleSession;
 		}
 
@@ -98,7 +98,7 @@ namespace BattleBlast.Server
 		{
 			if (receivedData.data is UnitOrderMove unitOrder)
 			{
-				if (IsValidOrder(unitOrder))
+				if (battlePhase == BattlePhase.PlanningPhase && IsValidOrder(unitOrder))
 				{
 					var existingOrder = orders.Find(u => u.unitInstanceId == unitOrder.unitInstanceId);
 					if (existingOrder != null) orders.Remove(existingOrder);
@@ -116,11 +116,18 @@ namespace BattleBlast.Server
 		{
 			if (receivedData.data is UnitOrderStop unitOrder)
 			{
-				var existingOrder = orders.Find(u => u.unitInstanceId == unitOrder.unitInstanceId);
-				if (existingOrder != null) orders.Remove(existingOrder);
+				if (battlePhase == BattlePhase.PlanningPhase)
+				{
+					var existingOrder = orders.Find(u => u.unitInstanceId == unitOrder.unitInstanceId);
+					if (existingOrder != null) orders.Remove(existingOrder);
 
-				orders.Add(unitOrder);
-				receivedData.SendResponse(true);
+					orders.Add(unitOrder);
+					receivedData.SendResponse(true);
+				}
+				else
+				{
+					receivedData.SendResponse(false);
+				}
 			}
 		}
 
@@ -356,6 +363,7 @@ namespace BattleBlast.Server
 			await SendBattleCommandStartActionPhase();
 
 			List<UnitAction> actions = ExecuteOrdersAndGenerateActions();
+			//await SendBattleCommandExecuteUnitActions(actions);
 			foreach (var action in actions)
 			{
 				await SendBoth(action);
@@ -364,6 +372,10 @@ namespace BattleBlast.Server
 			phaseTaskCompletionSource.TrySetResult(true);
 		}
 
+		protected async Task SendBattleCommandExecuteUnitActions(List<UnitAction> actions)
+		{
+			await SendBoth(new BattleCommandExecuteUnitActions(battleData.id, actions));
+		}
 		protected async Task SendBattleCommandStartActionPhase()
 		{
 			await SendBoth(new BattleCommandStartActionPhase() { battleId = battleData.id });
