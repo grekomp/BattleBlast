@@ -9,6 +9,11 @@ namespace ScriptableSystems
 		{
 			ScriptableSystemsManager.Instance.Awake();
 		}
+		protected override void Start()
+		{
+			base.Start();
+			ScriptableSystemsManager.Instance.Start();
+		}
 		private void Update()
 		{
 			ScriptableSystemsManager.Instance.Update();

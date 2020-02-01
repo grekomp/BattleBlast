@@ -16,6 +16,7 @@ namespace BattleBlast.Server
 		private static readonly string LogTag = nameof(NetServer);
 
 		[Header("Server options")]
+		[SerializeField] private BoolReference autoStart = new BoolReference(false);
 		[SerializeField] private ServerSystems systems = new ServerSystems();
 
 		[Header("Runtime Variables")]
@@ -45,6 +46,14 @@ namespace BattleBlast.Server
 			// Register event listeners
 			startServerEvent.RegisterListenerOnce(StartServer);
 			stopServerEvent.RegisterListenerOnce(StopServer);
+		}
+
+		protected override void OnStart()
+		{
+			base.OnStart();
+
+			// Autostart 
+			if (autoStart) StartServer();
 		}
 		#endregion
 

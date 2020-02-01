@@ -34,6 +34,13 @@ namespace ScriptableSystems
 				OnAwake();
 			}
 		}
+		public void Start()
+		{
+			if (CanExecuteEvents())
+			{
+				OnStart();
+			}
+		}
 		public void Update()
 		{
 			if (CanExecuteEvents()) OnUpdate();
@@ -49,6 +56,7 @@ namespace ScriptableSystems
 		}
 
 		protected virtual void OnAwake() { }
+		protected virtual void OnStart() { }
 		protected virtual void OnUpdate() { }
 		protected virtual void OnFixedUpdate() { }
 

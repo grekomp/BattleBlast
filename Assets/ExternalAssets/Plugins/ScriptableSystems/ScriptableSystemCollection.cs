@@ -32,6 +32,13 @@ namespace ScriptableSystems
 				system?.Awake();
 			}
 		}
+		public void Start()
+		{
+			foreach (var system in systems)
+			{
+				system?.Start();
+			}
+		}
 		public void Update()
 		{
 			foreach (var system in systems)

@@ -72,6 +72,10 @@ namespace ScriptableSystems
 			EditorSceneManager.sceneUnloaded += OnSceneUnloaded;
 #endif
 		}
+		public void Start()
+		{
+			currentSystemsCollection?.Start();
+		}
 
 		public void OnSceneUnloaded(Scene scene)
 		{
