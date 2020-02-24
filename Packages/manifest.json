@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.athanor.athanor_utils": "ssh://git@github.com/grekomp/ArthanorUtils.git#upm",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.collab-proxy": "1.2.16",
     "com.unity.ide.rider": "1.1.4",
@@ -41,5 +42,11 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
+  },
+  "lock": {
+    "com.athanor.athanor_utils": {
+      "revision": "upm",
+      "hash": "ab132d5488d925e0324689d956ba9f282ccc4112"
+    }
   }
 }
