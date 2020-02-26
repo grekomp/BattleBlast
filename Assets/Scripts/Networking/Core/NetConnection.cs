@@ -41,15 +41,9 @@ namespace Networking
 
 
 		#region Confirming connection
-		public async Task<bool> WaitForConnectionConfirmation(int timeoutMs = -1)
+		public async Task<bool> WaitForConnectionConfirmation(CancellationToken cancellationToken = new CancellationToken())
 		{
-			if (timeoutMs > 0)
-			{
-				CancellationTokenSource cts = new CancellationTokenSource();
-				cts.CancelAfter(timeoutMs);
-				cts.Token.Register(() => connectionConfirmationTaskCompletionSource.TrySetCanceled());
-			}
-
+			cancellationToken.Register(() => connectionConfirmationTaskCompletionSource.TrySetCanceled());
 			return await connectionConfirmationTaskCompletionSource.Task;
 		}
 		public void ConfirmConnection()

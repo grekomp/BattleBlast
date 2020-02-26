@@ -1,4 +1,5 @@
-﻿using Networking;
+﻿using Athanor;
+using Networking;
 using ScriptableSystems;
 using System;
 using System.Collections.Generic;
@@ -10,10 +11,10 @@ using Utils;
 
 namespace BattleBlast.Server
 {
-	[CreateAssetMenu(menuName = "BattleBlast/Networking/NetServer")]
-	public class NetServer : ScriptableSystem<NetServer>
+	[CreateAssetMenu(menuName = "BattleBlast/Networking/BBServer")]
+	public class BBServer : ScriptableSystem<BBServer>
 	{
-		private static readonly string LogTag = nameof(NetServer);
+		private static readonly string LogTag = nameof(BBServer);
 
 		[Header("Server options")]
 		[SerializeField] private BoolReference autoStart = new BoolReference(false);
@@ -67,7 +68,7 @@ namespace BattleBlast.Server
 			Initialize();
 
 			// Add host
-			host = NetCore.Instance.AddHost();
+			host = NetCore.Instance.AddHost(hostName: "Server host");
 
 			// Initialize systems
 			systems.Initialize();
@@ -80,7 +81,7 @@ namespace BattleBlast.Server
 
 			// Start broadcasting
 			NetCore.Instance.StartBroadcastDiscovery(host.Port);
-			Log.Info(LogTag, $"Server started on HostId: {host.Id}, Port: {host.Port}.", this);
+			Log.Info(LogTag, $"Server started on Host: {host}.", this);
 		}
 		[ContextMenu(nameof(StopServer))]
 		public void StopServer()

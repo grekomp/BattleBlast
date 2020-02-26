@@ -1,4 +1,5 @@
-﻿using Networking;
+﻿using Athanor;
+using Networking;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -66,11 +67,11 @@ namespace BattleBlast
 			NetDataEventManager.Instance.RegisterHandler(battleCommandStartActionPhaseHandler);
 			NetDataEventManager.Instance.RegisterHandler(battleCommandExecuteUnitActionsHandler);
 
-			//NetDataEventManager.Instance.RegisterHandler(unitActionMoveHandler);
-			//NetDataEventManager.Instance.RegisterHandler(unitActionStopHandler);
-			//NetDataEventManager.Instance.RegisterHandler(unitActionAttackHandler);
-			//NetDataEventManager.Instance.RegisterHandler(unitActionRetaliateHandler);
-			//NetDataEventManager.Instance.RegisterHandler(unitActionDieHandler);
+			NetDataEventManager.Instance.RegisterHandler(unitActionMoveHandler);
+			NetDataEventManager.Instance.RegisterHandler(unitActionStopHandler);
+			NetDataEventManager.Instance.RegisterHandler(unitActionAttackHandler);
+			NetDataEventManager.Instance.RegisterHandler(unitActionRetaliateHandler);
+			NetDataEventManager.Instance.RegisterHandler(unitActionDieHandler);
 		}
 		#endregion
 
@@ -252,7 +253,7 @@ namespace BattleBlast
 			selectedUnit?.Deselect();
 			selectedUnit = null;
 
-			if (battleUnit.playerId != NetClient.Instance.PlayerId) return;
+			if (battleUnit.playerId != BBClient.Instance.PlayerId) return;
 
 			selectedUnit = battleUnit;
 			selectedUnit?.Select();
@@ -290,7 +291,7 @@ namespace BattleBlast
 		{
 			UnitOrderMove order = new UnitOrderMove(battleData.id, selectedUnit.unitInstanceId, x, y);
 
-			var request = NetRequest.CreateAndSend(NetClient.Instance.connection, order);
+			var request = NetRequest.CreateAndSend(BBClient.Instance.connection, order);
 			var response = await request.WaitForResponse();
 			if (response.error == null)
 			{
@@ -304,7 +305,7 @@ namespace BattleBlast
 		{
 			UnitOrderStop order = new UnitOrderStop(battleData.id, battleUnit.unitInstanceId);
 
-			var request = NetRequest.CreateAndSend(NetClient.Instance.connection, order);
+			var request = NetRequest.CreateAndSend(BBClient.Instance.connection, order);
 			var response = await request.WaitForResponse();
 			if (response.error == null)
 			{

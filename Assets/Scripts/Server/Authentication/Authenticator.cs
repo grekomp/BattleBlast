@@ -13,7 +13,7 @@ namespace BattleBlast.Server
 	{
 		public static bool TryAuthenticatePlayer(Credentials credentials, out PlayerData playerData, out string authToken)
 		{
-			playerData = NetServer.Instance.Systems.Database.GetPlayerDataByName(credentials.username);
+			playerData = BBServer.Instance.Systems.Database.GetPlayerDataByName(credentials.username);
 			if (playerData != null && playerData.IsPasswordValid(credentials.password))
 			{
 				authToken = Guid.NewGuid().ToString();

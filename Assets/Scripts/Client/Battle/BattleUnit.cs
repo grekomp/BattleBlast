@@ -45,7 +45,7 @@ namespace BattleBlast
 			SetAttack(unitInstanceData.attack);
 			SetCount(unitInstanceData.count);
 			playerId = unitInstanceData.playerId;
-			isFriendlyUnit.Value = playerId == NetClient.Instance.PlayerId;
+			isFriendlyUnit.Value = playerId == BBClient.Instance.PlayerId;
 
 			SetColor();
 

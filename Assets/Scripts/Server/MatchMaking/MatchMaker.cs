@@ -1,4 +1,5 @@
-﻿using BattleBlast.Server;
+﻿using Athanor;
+using BattleBlast.Server;
 using Networking;
 using ScriptableSystems;
 using System;
@@ -132,7 +133,7 @@ namespace BattleBlast
 			{
 				receivedData.requestHandled = true;
 
-				PlayerData playerData = NetServer.Instance.Systems.Database.GetPlayerDataById(matchMakingRequest.playerId);
+				PlayerData playerData = BBServer.Instance.Systems.Database.GetPlayerDataById(matchMakingRequest.playerId);
 				MatchMakingResult result = await FindAMatch(playerData, matchMakingRequest.matchMakingSettings);
 				Log.D(result);
 				receivedData.SendResponse(result);
@@ -150,7 +151,7 @@ namespace BattleBlast
 			{
 				SetMatchFoundFor(matchingPlayer);
 
-				var battleId = NetServer.Instance.Systems.BattleManager.CreateBattleFor(matchingPlayer.player, newQueueEntry.player, new BattleCreationData());
+				var battleId = BBServer.Instance.Systems.BattleManager.CreateBattleFor(matchingPlayer.player, newQueueEntry.player, new BattleCreationData());
 				result = new MatchMakingResult(newQueueEntry.player, matchingPlayer.player, battleId, MatchMakingResult.Status.MatchFound);
 
 				matchingPlayer.matchFoundTaskCompletionSource.SetResult(result);

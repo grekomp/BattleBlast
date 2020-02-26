@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Athanor;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,7 @@ namespace Networking
 		public string id = Guid.NewGuid().ToString();
 		public NetConnection connection = null;
 		public NetReceivedData response = null;
+		public NetDataPackage sentDataPackage = null;
 
 
 		protected DataHandler responseHandler;
@@ -36,6 +38,7 @@ namespace Networking
 			};
 
 			dataPackage.responseRequired = true;
+			netRequest.sentDataPackage = dataPackage;
 			netRequest.RegisterResponseHandler();
 			connection.Send(dataPackage, channel);
 
@@ -62,7 +65,7 @@ namespace Networking
 		{
 			response = receivedData;
 
-			if (response.error != null) Log.Warning(LogTag, $"Request responded with error. Error: {response.error}, RequestId: {id}.");
+			if (response.error != null) Log.Warning(LogTag, $"Request responded with error. Error: {response.error}, SentDataPackageType: {sentDataPackage.dataType}, RequestId: {id}.");
 
 			responseTaskCompletionSource.TrySetResult(response);
 		}

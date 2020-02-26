@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -25913,9 +25913,6 @@ MonoBehaviour:
     debugChanges: 1
   outputUpdated:
     inspectedEvent: {fileID: 0}
-  messageTextDataKey:
-    variable: {fileID: 11400000, guid: 69b1865f1329a1248993a01e3acb36b5, type: 2}
-    keyString: 
 --- !u!1 &514544923
 GameObject:
   m_ObjectHideFlags: 0
@@ -39486,7 +39483,6 @@ GameObject:
   - component: {fileID: 812126921}
   - component: {fileID: 812126923}
   - component: {fileID: 812126924}
-  - component: {fileID: 812126925}
   m_Layer: 0
   m_Name: NetworkingClient
   m_TagString: Untagged
@@ -39508,6 +39504,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   networkingClientSettings:
     connectToServerTimeout: -1
+  autoConnect:
+    useConstant: 1
+    constantValue: 0
+    variable: {fileID: 0}
+    _usesTemporaryVariable: 0
+    debugEnabled: 0
+    debugLogAll: 1
+    debugVariableReplacements: 1
+    debugFailedVariableReplacements: 0
+    debugChanges: 1
+  autoReconnect:
+    useConstant: 1
+    constantValue: 1
+    variable: {fileID: 0}
+    _usesTemporaryVariable: 0
+    debugEnabled: 0
+    debugLogAll: 1
+    debugVariableReplacements: 1
+    debugFailedVariableReplacements: 0
+    debugChanges: 1
   state: 0
   host: {fileID: 0}
   connection: {fileID: 0}
@@ -39599,39 +39615,6 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 812126921}
         m_MethodName: DisconnectFromServer
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  responseWithData:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &812126925
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 812126920}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 884af027628698c41abe778341551f7a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameEvent:
-    inspectedEvent: {fileID: 11400000, guid: 684d22d46a6e2c243a5fadecd47b0ec1, type: 2}
-  enableInEditor: 1
-  debug: 0
-  response:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 812126921}
-        m_MethodName: TryConnectToServer
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -53357,7 +53340,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   options:
-    broadcastPort: 8890
+    broadcastPort: 52489
     broadcastKey: 8671
     broadcastVersion: 1
     broadcastSubversion: 1
@@ -109465,6 +109448,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ClientTesters
+      objectReference: {fileID: 0}
+    - target: {fileID: 133447729398917781, guid: d7b467ac3cc6d17478b1f5c3a5e649d5,
+        type: 3}
+      propertyPath: credentials.username
+      value: Piopek
+      objectReference: {fileID: 0}
+    - target: {fileID: 133447729398917781, guid: d7b467ac3cc6d17478b1f5c3a5e649d5,
+        type: 3}
+      propertyPath: credentials.password
+      value: 456
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d7b467ac3cc6d17478b1f5c3a5e649d5, type: 3}

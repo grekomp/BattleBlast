@@ -1,4 +1,5 @@
-﻿using Networking;
+﻿using Athanor;
+using Networking;
 using ScriptableSystems;
 using System;
 using System.Collections.Generic;
@@ -11,9 +12,9 @@ using Utils;
 
 namespace BattleBlast
 {
-	public class NetClient : DontDestroySingleton<NetClient>
+	public class BBClient : DontDestroySingleton<BBClient>
 	{
-		private static readonly string LogTag = nameof(NetClient);
+		private static readonly string LogTag = nameof(BBClient);
 
 		#region Inner classes
 		public enum ClientState
@@ -35,6 +36,8 @@ namespace BattleBlast
 
 		[Header("Networking Client Options")]
 		[SerializeField] protected NetClientSettings networkingClientSettings;
+		public BoolReference autoConnect = new BoolReference(true);
+		public BoolReference autoReconnect = new BoolReference(true);
 
 		[Header("Runtime Variables")]
 		[SerializeField] [Disabled] protected ClientState state;
@@ -57,7 +60,7 @@ namespace BattleBlast
 		#region Initialization
 		protected void Awake()
 		{
-			host = NetCore.Instance.AddHost();
+			host = NetCore.Instance.AddHost(hostName: "Client host");
 		}
 
 		private void OnEnable()
@@ -66,7 +69,7 @@ namespace BattleBlast
 			host.OnConnectEvent.RegisterListenerOnce(HandleConnect);
 			NetCore.Instance.OnBroadcastEvent.RegisterListenerOnce(HandleBroadcastEvent);
 
-			TryConnectToServer();
+			if (autoConnect) TryConnectToServer();
 		}
 		private void OnDisable()
 		{
@@ -257,6 +260,8 @@ namespace BattleBlast
 			connection = null;
 
 			OnDisconnect?.Raise(this);
+
+			if (autoReconnect) TryConnectToServer();
 		}
 		protected void HandleDataReceived(GameEventData gameEventData)
 		{

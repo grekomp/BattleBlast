@@ -1,4 +1,5 @@
-﻿using BattleBlast.Server;
+﻿using Athanor;
+using BattleBlast.Server;
 using Networking;
 using ScriptableSystems;
 using System;
@@ -13,7 +14,7 @@ namespace BattleBlast
 	public class BattleManager : ScriptableSystem
 	{
 		public readonly static string LogTag = nameof(BattleManager);
-		public static BattleManager Instance => NetServer.Instance.Systems.BattleManager;
+		public static BattleManager Instance => BBServer.Instance.Systems.BattleManager;
 
 		public List<UnitInstanceData> testBattleUnits = new List<UnitInstanceData>();
 
@@ -44,7 +45,7 @@ namespace BattleBlast
 		public bool StartBattle(BattleData battle)
 		{
 			BattleSession battleSession = BattleSession.New(battle);
-			var task = Task.Run(battleSession.Start);
+			battleSession.Start();
 			return true;
 		}
 		#endregion
@@ -67,14 +68,14 @@ namespace BattleBlast
 			Log.Info(LogTag, "Starting test battle...", this);
 
 			// Check if there are at least two players connected and authenticated
-			if (NetServer.Instance.Systems.ClientManager.ConnectedClients.Count < 2)
+			if (BBServer.Instance.Systems.ClientManager.ConnectedClients.Count < 2)
 			{
 				Log.Warning(LogTag, "Failed starting test battle, there are not enough connected clients.", this);
 				return;
 			}
 
-			ConnectedClient player01 = NetServer.Instance.Systems.ClientManager.ConnectedClients[0];
-			ConnectedClient player02 = NetServer.Instance.Systems.ClientManager.ConnectedClients[1];
+			BBConnectedClient player01 = BBServer.Instance.Systems.ClientManager.ConnectedClients[0];
+			BBConnectedClient player02 = BBServer.Instance.Systems.ClientManager.ConnectedClients[1];
 
 			BattleData battle = CreateBattleFor(player01.PlayerData, player02.PlayerData, new BattleCreationData());
 			battle.unitsOnBoard = new List<UnitInstanceData>();

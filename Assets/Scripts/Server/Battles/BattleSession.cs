@@ -1,4 +1,5 @@
-﻿using Networking;
+﻿using Athanor;
+using Networking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,8 +19,8 @@ namespace BattleBlast.Server
 
 		public BattleData battleData;
 
-		public ConnectedClient player1;
-		public ConnectedClient player2;
+		public BBConnectedClient player1;
+		public BBConnectedClient player2;
 
 		public int turnTime = 5000;
 		public int turnEndingTime = 3000;
@@ -61,8 +62,8 @@ namespace BattleBlast.Server
 			// Load players
 			LoadBattleRequestData loadBattleRequestData = new LoadBattleRequestData() { battle = battleData };
 
-			NetRequest request1 = NetRequest.CreateAndSend(player1.Connection, loadBattleRequestData, Channel.ReliableFragmented);
-			NetRequest request2 = NetRequest.CreateAndSend(player2.Connection, loadBattleRequestData, Channel.ReliableFragmented);
+			NetRequest request1 = NetRequest.CreateAndSend(player1.NetworkingClient.Connection, loadBattleRequestData, Channel.ReliableFragmented);
+			NetRequest request2 = NetRequest.CreateAndSend(player2.NetworkingClient.Connection, loadBattleRequestData, Channel.ReliableFragmented);
 
 			await Task.WhenAll(request1.WaitForResponse(), request2.WaitForResponse());
 
@@ -386,8 +387,8 @@ namespace BattleBlast.Server
 		}
 		protected async Task<bool> SendBoth(object serializableData)
 		{
-			var request1 = NetRequest.CreateAndSend(player1.Connection, serializableData);
-			var request2 = NetRequest.CreateAndSend(player2.Connection, serializableData);
+			var request1 = NetRequest.CreateAndSend(player1.NetworkingClient.Connection, serializableData);
+			var request2 = NetRequest.CreateAndSend(player2.NetworkingClient.Connection, serializableData);
 			await Task.WhenAll(request1.WaitForResponse(), request2.WaitForResponse());
 
 			return request1.response.GetDataOrDefault<bool>() && request2.response.GetDataOrDefault<bool>();

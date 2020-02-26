@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Athanor;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,41 +10,41 @@ namespace Utils
 {
 	public class LogMessageListGenerator : DataSource
 	{
-		[Header("Data Keys")]
-		public DataKey messageTextDataKey;
+		//[Header("Data Keys")]
+		//public DataKey messageTextDataKey;
 
-		protected override void Init()
-		{
-			base.Init();
+		//protected override void Init()
+		//{
+		//	base.Init();
 
-			Log.OnMessagesChanged += ApplySet;
-		}
+		//	Log.OnMessagesChanged += ApplySet;
+		//}
 
-		protected override void OnEnable()
-		{
-			Log.OnMessagesChanged -= ApplySet;
-			Log.OnMessagesChanged += ApplySet;
-			base.OnEnable();
-		}
-		protected void OnDisable()
-		{
-			Log.OnMessagesChanged -= ApplySet;
-		}
+		//protected override void OnEnable()
+		//{
+		//	Log.OnMessagesChanged -= ApplySet;
+		//	Log.OnMessagesChanged += ApplySet;
+		//	base.OnEnable();
+		//}
+		//protected void OnDisable()
+		//{
+		//	Log.OnMessagesChanged -= ApplySet;
+		//}
 
 		protected override void ApplySet()
 		{
-			DataBundleCollection dataBundleCollection = new DataBundleCollection();
+			//	DataBundleCollection dataBundleCollection = new DataBundleCollection();
 
-			foreach (var message in Log.messages)
-			{
-				DataBundle messageDataBundle = DataBundle.New();
+			//	foreach (var message in Log.messages)
+			//	{
+			//		DataBundle messageDataBundle = DataBundle.New();
 
-				messageDataBundle.Set(messageTextDataKey, StringVariable.New(message));
+			//		messageDataBundle.Set(messageTextDataKey, StringVariable.New(message));
 
-				dataBundleCollection.Add(messageDataBundle);
-			}
+			//		dataBundleCollection.Add(messageDataBundle);
+			//	}
 
-			Output(dataBundleCollection);
+			//	Output(dataBundleCollection);
 		}
 	}
 }

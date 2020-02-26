@@ -42,10 +42,15 @@ public static class TaskExtensions
 		return AsIEnumerator(Task.Run(function, ct));
 	}
 
-	internal static CancellationToken GetTimeoutCancellationToken(int timeoutMs)
+	public static CancellationToken GetTimeoutCancellationToken(int timeoutMs)
 	{
 		CancellationTokenSource cts = new CancellationTokenSource();
 		cts.CancelAfter(timeoutMs);
 		return cts.Token;
+	}
+
+	public static CancellationToken GetCancellationToken(this int timeoutMs)
+	{
+		return GetTimeoutCancellationToken(timeoutMs);
 	}
 }

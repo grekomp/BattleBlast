@@ -15,7 +15,7 @@ namespace BattleBlast
 		[ContextMenu("Try authenticate player")]
 		public async void TryAuthenticatePlayer()
 		{
-			bool result = await NetClient.Instance.TryAuthenticate(credentials);
+			await BBClient.Instance.TryAuthenticate(credentials);
 		}
 	}
 }

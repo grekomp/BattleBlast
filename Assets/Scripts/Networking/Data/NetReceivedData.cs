@@ -27,6 +27,8 @@ namespace Networking
 			error = (Error)dataPackage.serializedError.Deserialize();
 		}
 
+
+		#region Retrieving data
 		public T GetData<T>()
 		{
 			return (T)data;
@@ -40,11 +42,15 @@ namespace Networking
 
 			return default;
 		}
+		#endregion
 
+
+		#region Sending response
 		public void SendResponse(object responseData, Error error = null)
 		{
 			requestHandled = true;
 			connection.Send(NetDataPackage.CreateFrom(responseData, id, error: error));
 		}
+		#endregion
 	}
 }

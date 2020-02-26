@@ -41,8 +41,8 @@ namespace Tests
 		[SetUp]
 		public void SetUp()
 		{
-			NetServer.Instance.Systems.MatchMaker.Dispose();
-			NetServer.Instance.Systems.MatchMaker.matchMakerSettings = testMatchmakerSettings;
+			BBServer.Instance.Systems.MatchMaker.Dispose();
+			BBServer.Instance.Systems.MatchMaker.matchMakerSettings = testMatchmakerSettings;
 		}
 
 		[UnityTest]
@@ -50,9 +50,9 @@ namespace Tests
 		{
 			yield return TaskExtensions.RunTaskAsIEnumerator(async () =>
 			{
-				var task1 = NetServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
+				var task1 = BBServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
 				Assert.That(task1.IsCompleted, Is.False);
-				Assert.That(NetServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer01), Is.True);
+				Assert.That(BBServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer01), Is.True);
 				await task1;
 			});
 		}
@@ -61,8 +61,8 @@ namespace Tests
 		{
 			yield return TaskExtensions.RunTaskAsIEnumerator(async () =>
 			{
-				var task1 = NetServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
-				var task2 = NetServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
+				var task1 = BBServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
+				var task2 = BBServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
 				await task2;
 
 				Assert.That(task1.IsCompleted, Is.False);
@@ -77,21 +77,21 @@ namespace Tests
 		{
 			yield return TaskExtensions.RunTaskAsIEnumerator(async () =>
 			{
-				var task1 = NetServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
-				Assert.That(NetServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer01), Is.True);
+				var task1 = BBServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
+				Assert.That(BBServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer01), Is.True);
 				Assert.That(task1.IsCompleted, Is.False);
-				NetServer.Instance.Systems.MatchMaker.CancelFindingMatchFor(testPlayer01);
-				Assert.That(NetServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer01), Is.False);
+				BBServer.Instance.Systems.MatchMaker.CancelFindingMatchFor(testPlayer01);
+				Assert.That(BBServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer01), Is.False);
 				Assert.That(task1.IsCompleted, Is.True);
 				Assert.That(task1.Result, Is.Not.Null);
 				Assert.That(task1.Result.status, Is.EqualTo(MatchMakingResult.Status.Cancelled));
 
 				// Add another player to queue and verify that he does not get matched with a cancelled player
-				var task2 = NetServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer02, new MatchMakingSettings());
-				Assert.That(NetServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer02), Is.True);
+				var task2 = BBServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer02, new MatchMakingSettings());
+				Assert.That(BBServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer02), Is.True);
 				await task2;
-				NetServer.Instance.Systems.MatchMaker.CancelFindingMatchFor(testPlayer02);
-				Assert.That(NetServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer02), Is.False);
+				BBServer.Instance.Systems.MatchMaker.CancelFindingMatchFor(testPlayer02);
+				Assert.That(BBServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer02), Is.False);
 				Assert.That(task2.Result.status, Is.EqualTo(MatchMakingResult.Status.TimedOut));
 			});
 		}
@@ -101,11 +101,11 @@ namespace Tests
 		{
 			yield return TaskExtensions.RunTaskAsIEnumerator(async () =>
 			{
-				var task1 = NetServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer02, new MatchMakingSettings());
-				Assert.That(NetServer.Instance.Systems.MatchMaker.queue.Count, Is.EqualTo(1));
-				Assert.That(NetServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer02), Is.True);
+				var task1 = BBServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer02, new MatchMakingSettings());
+				Assert.That(BBServer.Instance.Systems.MatchMaker.queue.Count, Is.EqualTo(1));
+				Assert.That(BBServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer02), Is.True);
 
-				var task2 = NetServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
+				var task2 = BBServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
 				await task2;
 
 				Assert.That(task2.Result, Is.Not.Null);
@@ -117,9 +117,9 @@ namespace Tests
 				Assert.That(task1.Result.battleId, Is.Not.Null);
 				Assert.That(task1.Result.battleId, Is.EqualTo(task2.Result.battleId));
 
-				Assert.That(NetServer.Instance.Systems.MatchMaker.queue.Count, Is.Zero);
-				Assert.That(NetServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer01), Is.False);
-				Assert.That(NetServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer02), Is.False);
+				Assert.That(BBServer.Instance.Systems.MatchMaker.queue.Count, Is.Zero);
+				Assert.That(BBServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer01), Is.False);
+				Assert.That(BBServer.Instance.Systems.MatchMaker.IsPlayerInQueue(testPlayer02), Is.False);
 			});
 		}
 		[UnityTest]
@@ -127,7 +127,7 @@ namespace Tests
 		{
 			yield return TaskExtensions.RunTaskAsIEnumerator(async () =>
 			{
-				var task = NetServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
+				var task = BBServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer01, new MatchMakingSettings());
 
 				//await Task.Delay(testMatchmakerSettings.queueTimeoutLimit / 2);
 				Assert.That(task.IsCompleted, Is.False);
@@ -143,8 +143,8 @@ namespace Tests
 		{
 			yield return TaskExtensions.RunTaskAsIEnumerator(async () =>
 			{
-				var task1 = NetServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer01, new InvalidMatchMakingSettings());
-				var task2 = NetServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer02, new MatchMakingSettings());
+				var task1 = BBServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer01, new InvalidMatchMakingSettings());
+				var task2 = BBServer.Instance.Systems.MatchMaker.FindAMatch(testPlayer02, new MatchMakingSettings());
 
 				await task2;
 
@@ -156,7 +156,7 @@ namespace Tests
 		[TearDown]
 		public void TearDown()
 		{
-			NetServer.Instance.Systems.Dispose();
+			BBServer.Instance.Systems.Dispose();
 		}
 	}
 }

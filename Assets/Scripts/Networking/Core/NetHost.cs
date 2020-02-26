@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Athanor;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -14,12 +16,21 @@ namespace Networking
 	{
 		private static string LogTag = nameof(NetHost);
 
+		[Header("NetHost variables")]
+		[SerializeField] protected string hostName = "Unnamed";
 		[SerializeField] [Disabled] protected int id = -1;
 		[SerializeField] [Disabled] protected int port = -1;
-
 		[SerializeField] [Disabled] protected bool isActive = false;
 
+		[Header("Raised events")]
+		public GameEventHandler OnDataEvent = new GameEventHandler();
+		public GameEventHandler OnConnectEvent = new GameEventHandler();
+		public GameEventHandler OnDisconnectEvent = new GameEventHandler();
+		public GameEventHandler OnBroadcastEvent = new GameEventHandler();
+
+		[Header("Connections")]
 		[SerializeField] [Disabled] protected List<NetConnection> connections = new List<NetConnection>();
+
 
 		#region Properties
 		public int Id => id;
@@ -29,24 +40,24 @@ namespace Networking
 		public static NetHost Null => NetHost.New(-1, -1);
 		#endregion
 
+
 		#region Constructors
-		public static NetHost New(int id, int port)
+		public static NetHost New(int id, int port, string hostName = null)
 		{
 			NetHost newNetworkingHost = ScriptableObject.CreateInstance<NetHost>();
 			newNetworkingHost.id = id;
 			newNetworkingHost.port = port;
 			newNetworkingHost.isActive = id >= 0 && port > 0;
 
+			if (hostName == null) hostName = $"Unnamed ({Guid.NewGuid().ToString().Substring(0, 6)})";
+			newNetworkingHost.hostName = hostName;
+
 			return newNetworkingHost;
 		}
 		#endregion
 
-		#region Handling events
-		public GameEventHandler OnDataEvent = new GameEventHandler();
-		public GameEventHandler OnConnectEvent = new GameEventHandler();
-		public GameEventHandler OnDisconnectEvent = new GameEventHandler();
-		public GameEventHandler OnBroadcastEvent = new GameEventHandler();
 
+		#region Handling events
 		public void HandleDataEvent(NetReceivedData receivedData)
 		{
 			receivedData.connection.HandleDataEvent(receivedData);
@@ -70,21 +81,11 @@ namespace Networking
 		}
 		#endregion
 
-		#region Scanning for broadcast
-		public void StartScanningForBroadcast()
-		{
-			throw new NotImplementedException();
-		}
-		public void StopScanningForBroadcast()
-		{
-			throw new NotImplementedException();
-		}
-		#endregion
 
 		#region Managing connections
-		public async Task<NetConnection> ConnectWithConfirmation(string serverIP, int port)
+		public async Task<NetConnection> ConnectWithConfirmation(string serverIP, int port, CancellationToken cancellationToken = new CancellationToken())
 		{
-			return await NetCore.Instance.ConnectWithConfirmation(id, serverIP, port);
+			return await NetCore.Instance.ConnectWithConfirmation(id, serverIP, port, cancellationToken);
 		}
 		public NetConnection Connect(string serverIP, int port)
 		{
@@ -136,11 +137,20 @@ namespace Networking
 		}
 		#endregion
 
+
+		#region Deactivation
 		public void Deactivate()
 		{
 			isActive = false;
 		}
+		#endregion
 
 
+		#region Overrides
+		public override string ToString()
+		{
+			return $"NetHost({hostName}, id: {id}, port: {port})";
+		}
+		#endregion
 	}
 }

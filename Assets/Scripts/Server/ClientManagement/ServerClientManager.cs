@@ -12,15 +12,15 @@ namespace BattleBlast.Server
 	[CreateAssetMenu(menuName = "BattleBlast/Systems/ServerClientManager")]
 	public class ServerClientManager : ScriptableSystem
 	{
-		public static ServerClientManager Instance => NetServer.Instance.Systems.ClientManager;
+		public static ServerClientManager Instance => BBServer.Instance.Systems.ClientManager;
 
 
 		[SerializeField] protected List<NetConnection> unauthenticatedClientConnections = new List<NetConnection>();
-		[SerializeField] private List<ConnectedClient> connectedClients = new List<ConnectedClient>();
+		[SerializeField] private List<BBConnectedClient> connectedClients = new List<BBConnectedClient>();
 
 		protected DataHandler dataHandler;
 
-		public List<ConnectedClient> ConnectedClients => new List<ConnectedClient>(connectedClients);
+		public List<BBConnectedClient> ConnectedClients => new List<BBConnectedClient>(connectedClients);
 
 
 		#region Initialization
@@ -30,7 +30,7 @@ namespace BattleBlast.Server
 
 			dataHandler = DataHandler.New(HandleAuthenticationRequest, new NetDataFilterType(typeof(Credentials)));
 
-			NetServer.Instance.host.OnConnectEvent.RegisterListenerOnce(HandleConnectGameEvent);
+			BBServer.Instance.host.OnConnectEvent.RegisterListenerOnce(HandleConnectGameEvent);
 			NetDataEventManager.Instance.RegisterHandler(dataHandler);
 		}
 		#endregion
@@ -69,7 +69,7 @@ namespace BattleBlast.Server
 		{
 			if (unauthenticatedClientConnections.Contains(connection)) RemoveUnauthenticatedClient(connection);
 
-			var connectedClient = connectedClients.Find(c => c.Connection.Equals(connection));
+			var connectedClient = connectedClients.Find(c => c.NetworkingClient.Connection.Equals(connection));
 			if (connectedClient != null) RemoveConnectedClient(connectedClient);
 		}
 
@@ -80,25 +80,25 @@ namespace BattleBlast.Server
 				connection?.Disconnect();
 			}
 
-			foreach (var connectedClient in new List<ConnectedClient>(connectedClients))
+			foreach (var connectedClient in new List<BBConnectedClient>(connectedClients))
 			{
-				connectedClient?.Connection?.Disconnect();
+				connectedClient?.NetworkingClient?.Connection?.Disconnect();
 			}
 
 			unauthenticatedClientConnections.Clear();
 			connectedClients.Clear();
 		}
-		protected void AddConnectedClient(ConnectedClient connectedClient)
+		protected void AddConnectedClient(BBConnectedClient connectedClient)
 		{
 			connectedClients.Add(connectedClient);
 		}
-		public void RemoveConnectedClient(ConnectedClient client)
+		public void RemoveConnectedClient(BBConnectedClient client)
 		{
 			connectedClients.Remove(client);
 		}
 
 
-		public ConnectedClient GetClientForPlayer(PlayerData playerData)
+		public BBConnectedClient GetClientForPlayer(PlayerData playerData)
 		{
 			return connectedClients.Find(c => c.PlayerData.Equals(playerData));
 		}
@@ -110,9 +110,9 @@ namespace BattleBlast.Server
 		{
 			if (receivedData.data is Credentials credentials)
 			{
-				if (TryAuthenticateClient(receivedData.connection, credentials, out ConnectedClient connectedClient))
+				if (TryAuthenticateClient(receivedData.connection, credentials, out BBConnectedClient connectedClient))
 				{
-					RemoveUnauthenticatedClient(connectedClient.Connection);
+					RemoveUnauthenticatedClient(connectedClient.NetworkingClient.Connection);
 					AddConnectedClient(connectedClient);
 					receivedData.SendResponse(new AuthenticationResult(true, connectedClient.AuthToken, connectedClient.PlayerData.id));
 				}
@@ -123,12 +123,12 @@ namespace BattleBlast.Server
 			}
 		}
 
-		public bool TryAuthenticateClient(NetConnection connection, Credentials credentials, out ConnectedClient connectedClient)
+		public bool TryAuthenticateClient(NetConnection connection, Credentials credentials, out BBConnectedClient connectedClient)
 		{
 			bool authenticationResult = Authenticator.TryAuthenticatePlayer(credentials, out PlayerData playerData, out string authToken);
 			if (authenticationResult)
 			{
-				connectedClient = ConnectedClient.New(connection, playerData, authToken);
+				connectedClient = new BBConnectedClient() { PlayerData = playerData, AuthToken = authToken };
 				return true;
 			}
 			else
